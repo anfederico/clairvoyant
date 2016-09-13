@@ -49,4 +49,4 @@ driver.find_element(By.XPATH, ".//*[@id='chart-container']/tab-chart/div/div[2]/
 # Click Export by Spreadsheet
 driver.find_element(By.XPATH, ".//*[@id='chart-container']/tab-chart/div/div[2]/div/export-menu/div/dropdown-menu/div/div[2]/dropdown-menu-item[1]/div/div").click()
 
-# That's it! You should see a CSV file download automatically initiate.
+# That's it! You should see a file download automatically initiate.
