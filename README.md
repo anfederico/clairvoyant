@@ -50,4 +50,5 @@
         6. Download a spreadsheet of the data
     
     This data can then be automatically plugged into the model and predict weather the conditions are favorable to make a trade  
+    Note: To edit this program, considering using Firebug/Firepath to identify your XPaths of interest
     
