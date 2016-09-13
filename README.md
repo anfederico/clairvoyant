@@ -44,7 +44,7 @@
     Upon execution, the program will:
         1. Travel to Fidelity
         2. Access their research tools for a particular stock
-        3. Automatically fill credentials
+        3. Automatically fill credentials (requires a Fidelity account)
         4. Access advanced charting mode
         5. Select indicators of choice
         6. Download a spreadsheet of the data
