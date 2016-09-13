@@ -30,6 +30,6 @@
     Note that accuracy may not be indicative of good/bad clustering in terms of finding hot spots
     
     Output
-    
+    ![alt tag]https://github.com/anfederico/Waldo/blob/master/TSLA.png
     
     
