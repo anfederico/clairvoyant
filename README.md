@@ -36,3 +36,5 @@
 <p align="center">
 <img src="https://github.com/anfederico/Waldo/blob/master/TSLA_Plot.png"/>
 </p>
+
+### Monitor Stocks for Promising Conditions
