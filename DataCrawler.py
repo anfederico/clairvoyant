@@ -1,5 +1,9 @@
 from selenium import webdriver
 from selenium.webdriver.common.by import By
+
+# Download the Chrome Driver here: https://sites.google.com/a/chromium.org/chromedriver/
+# Place in the appropriate path
+# You can also use a Firefox Driver
 driver = webdriver.Chrome("C:\Python27\Scripts\chromedriver.exe")
 
 # Request Fidelity Research page
@@ -13,7 +17,8 @@ ticker.submit()
 # Click to log in
 driver.find_element(By.XPATH, "html/body/table/tbody/tr/td[4]/div[4]/div/a").click()
 
-#Send keys to login form
+# Send keys to login form
+# You'll need a Fidelity account to access this page
 username = driver.find_element_by_id("userId")
 username.send_keys("[USER]")
 password = driver.find_element_by_id("password")
@@ -29,7 +34,7 @@ driver.find_element(By.XPATH, ".//*[@id='chart-container']/tab-chart/div/div[2]/
 # Click Stochastic Slow
 driver.find_element(By.XPATH, ".//*[@id='chart-container']/tab-chart/div/div[2]/advanced-chart/div/div[1]/fmr-advanced-chart-menu/div/div[2]/div[3]/div[1]/div[8]").click()
 
-# Click Indicators
+# Click Indicators Again
 driver.find_element(By.XPATH, ".//*[@id='chart-container']/tab-chart/div/div[2]/advanced-chart/div/div[1]/fmr-advanced-chart-menu/div/div[1]/div[2]/div[5]").click()
 
 # Click Social Sentiment
