@@ -1,4 +1,4 @@
-Copyright (c) 2016, Anthony Federico
+Copyright (c) 2016, Anthony Federico and Joey Howlett
 
 All rights reserved.
 
