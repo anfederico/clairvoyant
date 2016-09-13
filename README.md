@@ -24,7 +24,7 @@
     Outfile Path = path/to/TrainingData
     Training Data can then be fed directly to the classification algorithm
     
-### Radial Basis Function Support Vector Machine (RBFSVM)
+### Radial Basis Function Support Vector Machine (RBFSVM.py)
     This program reads in Training Data and feeds it to the classification algorithm via sci-kit learn
     Please visit: http://scikit-learn.org/stable/auto_examples/svm/plot_rbf_parameters.html before adjusting parameters
     Part of the training data is reserved for accuracy testing (this parameter can be changed)
