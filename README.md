@@ -31,6 +31,7 @@
     Note that accuracy may not be indicative of good/bad clustering in terms of finding hot spots
     Left: Training (Dark) and Testing (Light) Data
     Right: Training and Testing Data with gradient clustering
+    Blue = Positive (+) / Red = Negative (-)
 
 <p align="center">
 <img src="https://github.com/anfederico/Waldo/blob/master/TSLA_Plot.png"/>
