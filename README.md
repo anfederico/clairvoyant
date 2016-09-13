@@ -28,9 +28,10 @@
     This program reads in Training Data and feeds it to the clustering algorithm via sci-kit learn
     Part of the training data is reserved for accuracy testing (this parameter can be changed)
     Note that accuracy may not be indicative of good/bad clustering in terms of finding hot spots
-
+    Left: Training (Dark) and Testing (Light) Data
+    Right: Training and Testing Data with gradient clustering
 
 <p align="center">
-  <img src="https://github.com/anfederico/Waldo/blob/master/TSLA.png"/>
+<img src="https://github.com/anfederico/Waldo/blob/master/TSLA.png"/>
 </p>
     
