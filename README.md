@@ -29,7 +29,8 @@
     Part of the training data is reserved for accuracy testing (this parameter can be changed)
     Note that accuracy may not be indicative of good/bad clustering in terms of finding hot spots
 
-<b>Output</b>
-![alt tag]https://github.com/anfederico/Waldo/blob/master/TSLA.png
-    
+
+<p align="center">
+  <img src=https://github.com/anfederico/Waldo/blob/master/TSLA.png" width="350"/>
+</p>
     
