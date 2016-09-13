@@ -33,5 +33,5 @@
     Right: Training and Testing Data with gradient clustering
 
 <p align="center">
-<img src="https://github.com/anfederico/Waldo/blob/master/TSLA.png"/>
+<img src="https://github.com/anfederico/Waldo/blob/master/TSLA_Plot.png"/>
 </p>
