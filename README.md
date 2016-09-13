@@ -25,7 +25,7 @@
     Training Data can then be fed directly to the clustering algorithm
     
 ### Radial Basis Function Support Vector Machine (RBFSVM)
-    This program reads in Training Data and feeds it to the clustering algorithm via sci-kit learn
+    This program reads in Training Data and feeds it to the classification algorithm via sci-kit learn
     Please visit: http://scikit-learn.org/stable/auto_examples/svm/plot_rbf_parameters.html before adjusting parameters
     Part of the training data is reserved for accuracy testing (this parameter can be changed)
     Note that accuracy may not be indicative of good/bad clustering in terms of finding hot spots
