@@ -37,4 +37,17 @@
 <img src="https://github.com/anfederico/Waldo/blob/master/TSLA_Plot.png"/>
 </p>
 
-### Monitor Stocks for Promising Conditions
+### Monitor Stocks for Favorable Conditions
+    DataCrawl.py is a headless web browser using selenium
+    This tool can be used to access daily stock indicators after the model is trained with historical data
+    
+    Upon execution, the program will:
+        1. Travel to Fidelity
+        2. Access their research tools for a particular stock
+        3. Automatically fill credentials
+        4. Access advanced charting mode
+        5. Select indicators of choice
+        6. Download a spreadsheet of the data
+    
+    This data can then be automatically plugged into the model and predict weather the conditions are favorable to make a trade  
+    
