@@ -29,3 +29,7 @@
     Part of the training data is reserved for accuracy testing (this parameter can be changed)
     Note that accuracy may not be indicative of good/bad clustering in terms of finding hot spots
     
+    Output
+    
+    
+    
