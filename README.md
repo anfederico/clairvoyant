@@ -20,8 +20,8 @@
     
 ### MakeTrainingData.py
     This program will read in Raw Data and write out Training Data
-    Infile Path = /RawData
-    Outfile Path = /TrainingData
+    Infile Path = path/to/RawData
+    Outfile Path = path/to/TrainingData
     Training Data can then be fed directly to the clustering algorithm
     
 ### Radial Basis Function Support Vector Machine (RBFSVM)
@@ -35,4 +35,3 @@
 <p align="center">
 <img src="https://github.com/anfederico/Waldo/blob/master/TSLA.png"/>
 </p>
-    
