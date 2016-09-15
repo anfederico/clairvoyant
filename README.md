@@ -37,7 +37,7 @@
 <img src="https://github.com/anfederico/Waldo/blob/master/TSLA_Plot.png"/>
 </p>
 
-### Monitor Stocks for Favorable Conditions
+### Monitor Stocks for Favorable Conditions (DataCrawler.py)
     DataCrawler.py is a headless web browser using selenium
     This tool can be used to access daily stock indicators after the model is trained with historical data
     
