@@ -38,7 +38,7 @@
 </p>
 
 ### Monitor Stocks for Favorable Conditions
-    DataCrawl.py is a headless web browser using selenium
+    DataCrawler.py is a headless web browser using selenium
     This tool can be used to access daily stock indicators after the model is trained with historical data
     
     Upon execution, the program will:
