@@ -91,4 +91,7 @@ def RBFSVM(Ticker, gamma = 2.0, C = 1.0, h = 0.02):
     
     plt.show()
     
-RBFSVM('TSLA')    
+'''
+Example
+RBFSVM('TSLA')
+'''
