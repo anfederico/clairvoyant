@@ -10,12 +10,12 @@ from sklearn.svm import SVC
 
 '''
 Args:
-    1. Ticker(str): Name of stock
-    2. gamma(float): Kernel coefficient
+    1. Ticker (str): Name of stock
+    2. gamma (float): Kernel coefficient
         Default = 2
-    3. C(float): Penalty parameter of the error term
+    3. C (float): Penalty parameter of the error term
         Default = 1
-    4. h(int): Step size in the mesh
+    4. h (int): Step size in the mesh
         Default = 0.02
 
 Assumptions:
