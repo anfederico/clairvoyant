@@ -1,4 +1,4 @@
-# Waldo Documentation <img src="https://github.com/anfederico/Nucleic-Acid-Toolkit/blob/master/Toolkit.png" width="50"/> 
+# Waldo Documentation <img src="https://github.com/anfederico/Waldo/blob/master/Waldo.png" width="50"/> 
 <i>Software designed to identify and monitor social/historical cues for stock movement</i>
 
 ### Python Requirements
