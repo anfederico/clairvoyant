@@ -31,8 +31,9 @@ driver.get("https://screener.fidelity.com/ftgw/etf/gotoCL/snapshot/advancedChart
 # Click Indicators
 driver.find_element(By.XPATH, ".//*[@id='chart-container']/tab-chart/div/div[2]/advanced-chart/div/div[1]/fmr-advanced-chart-menu/div/div[1]/div[2]/div[5]").click()
 
-# Click Indicators Again
-driver.find_element(By.XPATH, ".//*[@id='chart-container']/tab-chart/div/div[2]/advanced-chart/div/div[1]/fmr-advanced-chart-menu/div/div[1]/div[2]/div[5]").click()
+# ====================== #
+# Insert Indicators here #
+# ====================== #
 
 # Click OK
 driver.find_element(By.XPATH, "html/body/div[8]/div/div/div[2]/div/div[3]/div/button").click()
