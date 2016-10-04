@@ -28,7 +28,7 @@ Returns:
     Nothing
 '''
 
-def RBFSVM(Ticker, gamma = 2.0, C = 1.0, h = 0.02):
+def RBFSVM(Ticker):
 
     # Load Training Data
     infile = open('%s_TrainingData.csv' % Ticker, 'r')
