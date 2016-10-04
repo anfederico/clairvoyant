@@ -31,7 +31,7 @@ Returns:
 def RBFSVM(Ticker, gamma = 2.0, C = 1.0, h = 0.02):
 
     # Load Training Data
-    infile = open('%s_SSOvSSC_TrainingData.csv' % Ticker, 'r')
+    infile = open('%s_TrainingData.csv' % Ticker, 'r')
     X = []
     y = []
     for line in infile:
