@@ -5,7 +5,7 @@ import os
 Args:
     1. Ticker (str): This is the stock you are reading and writing data for
                      Make sure infile is labeled  -> [Ticker]_RawData.csv
-                     Expect outfile to be labeled -> [Ticker]_SSOvSSC_TrainingData.csv
+                     Expect outfile to be labeled -> [Ticker]_TrainingData.csv
                      Either can be changed
       
     2. InfilePath  (str): Path to infile
@@ -13,11 +13,6 @@ Args:
    
 Assumptions: 
     Infile is present and labeled [Ticker]_RawData.csv 
-    
-Operations:
-    This function will read/store the Slow Stochastic Oscillator (SSO) vs. Social Sentiment Close (SSC) values
-    This function will also calculate the change in price the following day or Next Day Change (NDC)
-    These three values will be written on a single line for each day in the order SSO, SSC, NDC to a CSV outfile
     
 Returns: 
     Nothing
@@ -39,26 +34,25 @@ def MakeTraingingData(Ticker, InfilePath, OutfilePath):
         for row in reader:
             if row[7] != '' and row[12] != '':             
                 TradingDay = {}                             
-                i = 0                                     # Ensure SSO and S-Close values are available
+                i = 0                                     # Ensure X1 and X2 values are available
                 while i < len(row):                       # Organize each day into a dictionary
                     TradingDay[Header[i]] = row[i]        # Append each day to a list of all days
                     i += 1
                 RawData.append(TradingDay)                      
            
-    with open(os.path.join(OutfilePath, '%s_SSOvSSC_TrainingData.csv' % Ticker), 'w') as csvfile:
-        fieldnames = ['SSO', 'SSC', 'NDC']
+    with open(os.path.join(OutfilePath, '%s_TrainingData.csv' % Ticker), 'w') as csvfile:
+        fieldnames = ['X1', 'X2', 'y1']
         outfile = csv.DictWriter(csvfile, fieldnames=fieldnames)
         NextDayChange = False
         for TradingDay in RawData[::-1]:
             if NextDayChange != False:
-                SSO  = round(float(TradingDay['SSO']),2)
-                SSC  = round(float(TradingDay['S-Close']),2)
+                X1  = round(float(TradingDay['X1']),2)
+                X2  = round(float(TradingDay['X2']),2)
                 outfile.writerow({  
-                                    'SSO': SSO,
-                                    'SSC': SSC,
-                                    'NDC': NextDayChange,
+                                    'X1': X1,
+                                    'X2': X2,
+                                    'y1': y1,
                                 })    
-            NextDayChange = round(100*(float(TradingDay['Close'])-float(TradingDay['Open']))/float(TradingDay['Open']),2)
         
 '''
 Example:
