@@ -1,5 +1,5 @@
 # <img src="https://github.com/anfederico/Waldo/blob/master/Waldo.png" height=30px width=30px>&nbsp;Waldo
-<i>Software designed to identify and monitor social/historical cues for stock movement</i>
+<i>Software designed to identify and monitor social/historical cues for short term stock movement</i>
 
 ### Python Requirements
     csv
