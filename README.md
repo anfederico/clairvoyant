@@ -66,7 +66,7 @@ backtest.displayStats()
 <pre>
 <b>Conditions</b>
 X1: SSO
-X2: SC
+X2: SSC
 Buy Threshold: 65.0%
 Sell Threshold: 65.0%
 C: 1
