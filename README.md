@@ -1,54 +1,121 @@
-# <img src="https://github.com/anfederico/Waldo/blob/master/Waldo.png" height=30px width=30px>&nbsp;Waldo
-<i>Software designed to identify and monitor social/historical cues for short term stock movement</i>
+# Clairvoyant
 
-### Python Requirements
-    csv
-    os
-    selenium
-    numpy
-    matplotlib
-    sklearn
+[![Packagist](https://img.shields.io/packagist/l/doctrine/orm.svg)]()
 
-### Raw Data Requirements    
-    CSV containing raw historical data for each stock
-    
-    TSLA_RawData.csv
-    Date,Open,High,Low,Close,Volume
-    09/02/2015,245.3,247.88,239.78,247.69,4629174
-    09/03/2015,252.06,252.08,245,245.57,4194772
-    09/04/2015,240.89,244.09,238.2,241.93,3689153
-    
-### MakeTrainingData.py
-    This program will read in Raw Data and write out Training Data
-    Infile Path = path/to/RawData
-    Outfile Path = path/to/TrainingData
-    Training Data can then be fed directly to the classification algorithm
-    
-### Radial Basis Function Support Vector Machine (RBFSVM.py)
-    This program reads in Training Data and feeds it to the classification algorithm via sci-kit learn
-    Please visit: http://scikit-learn.org/stable/auto_examples/svm/plot_rbf_parameters.html before adjusting parameters
-    Part of the training data is reserved for accuracy testing (this parameter can be changed)
-    Note that accuracy may not be indicative of good/bad clustering in terms of finding hot spots
-    Left: Training (Dark) and Testing (Light) Data
-    Right: Training and Testing Data with gradient clustering
-    Blue = Positive (+) / Red = Negative (-)
+## Basic Overview
 
-<p align="center">
-<img src="https://github.com/anfederico/Waldo/blob/master/TSLA_Plot.png"/>
-</p>
+#### Schematic
+Using stock historical data, train a supervised learning algorithm with any combination of financial indicators. Rapidly backtesting your model for accuracy and simulate investment portfolio performance. 
+<p align="center"><img src="https://github.com/anfederico/Waldo/blob/master/media/Schematic.png" width=100%></p>
 
-### Monitor Stocks for Favorable Conditions (DataCrawler.py)
-    DataCrawler.py is a headless web browser using selenium
-    This tool can be used to access daily stock indicators after the model is trained with historical data
-    
-    Upon execution, the program will:
-        1. Travel to Fidelity
-        2. Access their research tools for a particular stock
-        3. Automatically fill credentials (requires a Fidelity account)
-        4. Access advanced charting mode
-        5. Select indicators of choice
-        6. Download a spreadsheet of the data
-    
-    This data can then be automatically plugged into the model and predict whether the conditions are favorable to make a trade  
-    Note: To edit this program, considering using Firebug/Firepath to identify your XPaths of interest
-    
+#### Visualize the Learning Process
+<img src="https://github.com/anfederico/Waldo/blob/master/media/TSLA.gif" width=50%><
+
+## Install
+```python
+pip install clairvoyant
+```
+## Code Examples
+
+#### Backtesting Signal Accuracy
+During the testing period, the model signals to buy or sell based on its prediction for price
+movement the following day. By putting your trading algorithm aside and testing for signal accuracy
+alone, you can rapidly build and test more reliable models.
+
+```python
+from clairvoyant import Backtest
+
+# Testing performance on a single stock
+
+variables  = ["SSO", "SSC"]     # Financial indicators of choice
+trainStart = '2013-03-01'       # Start of training period
+trainEnd   = '2015-07-15'       # End of training period
+testStart  = '2015-07-16'       # Start of testing period
+testEnd    = '2016-09-17'       # End of training period
+buyThreshold  = 0.65            # Confidence threshold for predicting buy (default = 0.65) 
+sellThreshold = 0.65            # Confidence threshold for predicting sell (default = 0.65)
+
+backtest = Backtest(variables, trainStart, trainEnd, testStart, testEnd, buyThreshold, sellThreshold)
+
+data = read_csv("Stocks/SBUX.csv")      # Read in data
+data = data.round(3)                    # Round all values                  
+backtest.stocks.append("SBUX")          # Inform the model which stock is being tested
+for i in range(0,10):                   # Run the model 10-15 times  
+    testSession.runModel(data)
+
+# Testing performance across multiple stocks
+
+stocks = ["AAPL", "ADBE", "AMGN", "AMZN",
+          "BIIB", "EBAY", "GILD", "GRPN", 
+          "INTC", "JBLU", "MSFT", "NFLX", 
+          "SBUX", "TSLA", "VRTX", "YHOO"]
+
+for stock in stocks:
+    data = read_csv('Stocks/%s.csv' % stock)
+    data = data.round(3)
+    backtest.stocks.append(stock)
+    for i in range(0,10):
+        testSession.runModel(data)
+```
+
+#### View Results
+```python
+backtest.displayConditions()
+backtest.displayStats()
+```
+<pre>
+<b>Conditions</b>
+X1: SSO
+X2: SC
+Buy Threshold: 65.0%
+Sell Threshold: 65.0%
+C: 1
+gamma: 10
+Continued Training: False
+<br>
+<b>Stats</b>
+Stock(s):
+AAPL | Training: 03/01/2013-07/15/2015 Testing: 07/16/2015-07/15/2016
+ADBE | Training: 03/01/2013-07/15/2015 Testing: 07/16/2015-07/15/2016
+AMGN | Training: 03/01/2013-07/15/2015 Testing: 07/16/2015-07/15/2016
+AMZN | Training: 03/01/2013-07/15/2015 Testing: 07/16/2015-07/15/2016
+BIIB | Training: 03/01/2013-07/15/2015 Testing: 07/16/2015-07/15/2016
+EBAY | Training: 03/01/2013-07/15/2015 Testing: 07/16/2015-07/15/2016
+GILD | Training: 03/01/2013-07/15/2015 Testing: 07/16/2015-07/15/2016
+GRPN | Training: 03/01/2013-07/15/2015 Testing: 07/16/2015-07/15/2016
+INTC | Training: 03/01/2013-07/15/2015 Testing: 07/16/2015-07/15/2016
+JBLU | Training: 03/01/2013-07/15/2015 Testing: 07/16/2015-07/15/2016
+MSFT | Training: 03/01/2013-07/15/2015 Testing: 07/16/2015-07/15/2016
+NFLX | Training: 03/01/2013-07/15/2015 Testing: 07/16/2015-07/15/2016
+SBUX | Training: 03/01/2013-07/15/2015 Testing: 07/16/2015-07/15/2016
+TSLA | Training: 03/01/2013-07/15/2015 Testing: 07/16/2015-07/15/2016
+VRTX | Training: 03/01/2013-07/15/2015 Testing: 07/16/2015-07/15/2016
+YHOO | Training: 03/01/2013-07/15/2015 Testing: 07/16/2015-07/15/2016
+<br>
+Total Buys: 39
+Buy Accuracy: <strong style="color: green;">62.86%</strong>
+Total Sells: 20
+Sell Accuracy: <strong style="color: green;">70.41%</strong>
+</pre>
+
+#### Multivariate Functionality
+```python
+variables = ["SSO"]                            # 1 Feature
+variables = ["SSO", "SSC"]                     # 2 Features
+variables = ["SSO", "SSC", "RSI"]              # 3 Features
+variables = ["SSO", "SSC", "RSI", ... , Xn]    # n Features
+
+```
+
+#### Visualize Model
+```python
+backtest.visualizeModel()
+```
+
+
+#### Portfolio Simulations
+
+```python
+
+
+```
