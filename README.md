@@ -55,7 +55,7 @@ for stock in stocks:
     data = data.round(3)
     backtest.stocks.append(stock)
     for i in range(0,10):
-        testSession.runModel(data)
+        backtest.runModel(data)
 ```
 
 #### View Results
