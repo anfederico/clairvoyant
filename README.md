@@ -71,7 +71,7 @@ Buy Threshold: 65.0%
 Sell Threshold: 65.0%
 C: 1
 gamma: 10
-Continued Training: False
+Continued Training: True
 <br>
 <b>Stats</b>
 Stock(s):
