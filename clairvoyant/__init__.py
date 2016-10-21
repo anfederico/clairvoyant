@@ -1,1 +1,1 @@
-from clairvoyant import Backtest
+from Backtest import Backtest
