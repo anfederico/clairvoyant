@@ -1,6 +1,5 @@
-<p align="center"><img src="https://github.com/anfederico/Waldo/blob/master/media/Clairvoyant.png" width=60%></p>
+# Clairvoyant
 
-[![PyPI version](https://badge.fury.io/py/stocktalk.svg)](https://badge.fury.io/py/clairvoyant)
 [![Packagist](https://img.shields.io/packagist/l/doctrine/orm.svg)]()
 
 ## Basic Overview
@@ -56,7 +55,7 @@ for stock in stocks:
     data = data.round(3)
     backtest.stocks.append(stock)
     for i in range(0,10):
-        backtest.runModel(data)
+        testSession.runModel(data)
 ```
 
 #### View Results
