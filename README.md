@@ -41,7 +41,7 @@ data = read_csv("Stocks/SBUX.csv")      # Read in data
 data = data.round(3)                    # Round all values                  
 backtest.stocks.append("SBUX")          # Inform the model which stock is being tested
 for i in range(0,10):                   # Run the model 10-15 times  
-    testSession.runModel(data)
+    backtest.runModel(data)
 
 # Testing performance across multiple stocks
 
