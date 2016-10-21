@@ -37,8 +37,11 @@ testStart  = '2015-07-16'       # Start of testing period
 testEnd    = '2016-09-17'       # End of training period
 buyThreshold  = 0.65            # Confidence threshold for predicting buy (default = 0.65) 
 sellThreshold = 0.65            # Confidence threshold for predicting sell (default = 0.65)
+C = 1                           # Penalty parameter (default = 1)
+gamma = 10                      # Kernel coefficient (default = 10)
+continuedTraining = False       # Continue training during testing period? (default = false)
 
-backtest = Backtest(variables, '2013-03-01', '2015-07-15', '2015-07-16', '2016-09-17', continuedTraining = False)
+backtest = Backtest(variables, trainStart, trainEnd, testStart, testEnd)
 
 data = read_csv("Stocks/SBUX.csv")      # Read in data
 data = data.round(3)                    # Round all values                  
@@ -46,9 +49,6 @@ backtest.stocks.append("SBUX")          # Inform the model which stock is being 
 for i in range(0,10):                   # Run the model 10-15 times  
     backtest.runModel(data)
 
-backtest.displayConditions()
-backtest.displayStats()
-    
 # Testing performance across multiple stocks
 
 stocks = ["AAPL", "ADBE", "AMGN", "AMZN",
@@ -62,9 +62,6 @@ for stock in stocks:
     backtest.stocks.append(stock)
     for i in range(0,10):
         backtest.runModel(data)
-        
-backtest.displayConditions()
-backtest.displayStats()
 ```
 
 #### View Results
