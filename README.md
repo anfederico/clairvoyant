@@ -11,7 +11,7 @@ Using stock historical data, train a supervised learning algorithm with any comb
 <p align="center"><img src="https://github.com/anfederico/Waldo/blob/master/media/Schematic.png" width=100%></p>
 
 #### Visualize the Learning Process
-<img src="https://github.com/anfederico/Waldo/blob/master/media/TSLA.gif" width=50%><
+<img src="https://github.com/anfederico/Waldo/blob/master/media/TSLA.gif" width=50%>
 
 ## Install
 ```python
