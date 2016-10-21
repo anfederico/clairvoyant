@@ -1,4 +1,4 @@
-# Clairvoyant
+<p align="center"><img src="https://github.com/anfederico/Clairvoyant/blob/master/media/Clairvoyant.png" width=60%></p>
 
 [![Packagist](https://img.shields.io/packagist/l/doctrine/orm.svg)]()
 
@@ -24,6 +24,7 @@ alone, you can rapidly build and test more reliable models.
 
 ```python
 from clairvoyant import Backtest
+from pandas import read_csv
 
 # Testing performance on a single stock
 
@@ -35,7 +36,7 @@ testEnd    = '2016-09-17'       # End of training period
 buyThreshold  = 0.65            # Confidence threshold for predicting buy (default = 0.65) 
 sellThreshold = 0.65            # Confidence threshold for predicting sell (default = 0.65)
 
-backtest = Backtest(variables, trainStart, trainEnd, testStart, testEnd, buyThreshold, sellThreshold)
+backtest = Backtest(variables, '2013-03-01', '2015-07-15', '2015-07-16', '2016-09-17', continuedTraining = False)
 
 data = read_csv("Stocks/SBUX.csv")      # Read in data
 data = data.round(3)                    # Round all values                  
@@ -43,6 +44,9 @@ backtest.stocks.append("SBUX")          # Inform the model which stock is being 
 for i in range(0,10):                   # Run the model 10-15 times  
     backtest.runModel(data)
 
+backtest.displayConditions()
+backtest.displayStats()
+    
 # Testing performance across multiple stocks
 
 stocks = ["AAPL", "ADBE", "AMGN", "AMZN",
@@ -55,7 +59,10 @@ for stock in stocks:
     data = data.round(3)
     backtest.stocks.append(stock)
     for i in range(0,10):
-        testSession.runModel(data)
+        backtest.runModel(data)
+        
+backtest.displayConditions()
+backtest.displayStats()
 ```
 
 #### View Results
@@ -98,24 +105,44 @@ Total Sells: 20
 Sell Accuracy: <strong style="color: green;">70.41%</strong>
 </pre>
 
-#### Multivariate Functionality
-```python
-variables = ["SSO"]                            # 1 Feature
-variables = ["SSO", "SSC"]                     # 2 Features
-variables = ["SSO", "SSC", "RSI"]              # 3 Features
-variables = ["SSO", "SSC", "RSI", ... , Xn]    # n Features
-
-```
 
 #### Visualize Model
 ```python
 backtest.visualizeModel()
 ```
 
-
-#### Portfolio Simulations
+#### Portfolio Simulation
 
 ```python
 
 
 ```
+
+## Other Features
+
+#### Multivariate Functionality
+```python
+variables = ["SSO"]                            # 1 feature
+variables = ["SSO", "SSC"]                     # 2 features
+variables = ["SSO", "SSC", "RSI"]              # 3 features
+variables = ["SSO", "SSC", "RSI", ... , Xn]    # n features
+
+```
+
+#### User Defined Trading Logic
+```python
+
+```
+
+#### Continue Training
+```python
+continuedTraining = False:    # Don't Update model during testing period
+continuedTraining = True:     # Update model during testing period (runtime increase)
+```
+
+#### Modify learning parameters
+```python
+C = 1:                        # Penalty parameter C of the error term.
+gamma = 10:                   # Kernel coefficient for radial basis function
+```
+
