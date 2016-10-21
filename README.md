@@ -1,5 +1,7 @@
 <p align="center"><img src="https://github.com/anfederico/Clairvoyant/blob/master/media/Clairvoyant.png" width=60%></p>
 
+[![PyPI version](https://badge.fury.io/py/clairvoyant.svg)](https://badge.fury.io/py/clairvoyant)
+[![Build Status](https://travis-ci.org/anfederico/Clairvoyant.svg?branch=master)](https://travis-ci.org/anfederico/Clairvoyant)
 [![Packagist](https://img.shields.io/packagist/l/doctrine/orm.svg)]()
 
 ## Basic Overview
