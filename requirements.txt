@@ -3,3 +3,4 @@ numpy==1.8.2
 pandas==0.18.1
 pyparsing==2.0.1
 scikit-learn==0.17.1
+SciPy==0.9
