@@ -6,7 +6,5 @@ setup(name='clairvoyant',
       author='Anthony Federico',
       author_email='dephoona@gmail.com',
       url='https://github.com/anfederico/Clairvoyant',
-      packages=['clairvoyant'],
-      license= 'MIT',
-      platform= 'Python 2.7'
+      packages=['clairvoyant']
      )
