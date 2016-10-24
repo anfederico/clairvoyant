@@ -1,7 +1,7 @@
 from distutils.core import setup
 
 setup(name='clairvoyant',
-      version='v0.1',
+      version='v0.5',
       description='Software designed to identify and monitor social/historical cues for short term stock movement',
       author='Anthony Federico',
       author_email='dephoona@gmail.com',
