@@ -1,16 +1,16 @@
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
-from matplotlib.colors import ListedColormap
-from sklearn.preprocessing import StandardScaler
 
-from numpy           import meshgrid, arange, c_
-from sklearn.svm     import SVC
-from pandas          import read_csv, to_datetime
-from numpy           import vstack, hstack
-from csv             import DictWriter
-from pandas.tslib    import relativedelta
-from dateutil.parser import parse
+from matplotlib.colors     import ListedColormap
+from numpy                 import meshgrid, arange, c_
+from sklearn.svm           import SVC
+from sklearn.preprocessing import StandardScaler
+from pandas                import read_csv, to_datetime
+from numpy                 import vstack, hstack
+from csv                   import DictWriter
+from pandas.tslib          import relativedelta
+from dateutil.parser       import parse
 
 def DateIndex(data, stock, date, end):
     lowbound = data["Date"][0]
@@ -72,10 +72,10 @@ class Backtest:
         data['Date'] = to_datetime(data['Date'])
         stock = self.stocks[len(self.stocks)-1]
         
-        trainStart   = DateIndex(data, stock, self.trainStart, False)
-        trainEnd     = DateIndex(data, stock, self.trainEnd, True)
-        testStart    = DateIndex(data, stock, self.testStart, False)
-        testEnd      = DateIndex(data, stock, self.testEnd, True)
+        trainStart = DateIndex(data, stock, self.trainStart, False)
+        trainEnd   = DateIndex(data, stock, self.trainEnd, True)
+        testStart  = DateIndex(data, stock, self.testStart, False)
+        testEnd    = DateIndex(data, stock, self.testEnd, True)
         
         self.dates.append([data['Date'][trainStart].strftime('%m/%d/%Y'),
                            data['Date'][trainEnd].strftime('%m/%d/%Y'),
@@ -87,7 +87,7 @@ class Backtest:
         # ====================== #
         
         X, y = [], []                                   
-        for i in range(trainStart, trainEnd+1):   # Training period
+        for i in range(trainStart, trainEnd+1):             # Training period
             
             Xs = []
             for var in self.variables:                      # Handles n variables
@@ -120,7 +120,7 @@ class Backtest:
             Xs = []
             for var in self.variables:
                 Xs.append(FindConditions(data, testDay, var))
-            
+   
             neg, pos = Predict(model, Xs)
         
             if   pos >= self.buyThreshold:  prediction =  1      # If positive confidence >= buyThreshold, predict buy
@@ -158,17 +158,14 @@ class Backtest:
             elif prediction == -1 and nextDayPerformance >= 0: pass
             
             # Case 5: No confident prediction
-    
+            
             # ====================== #
             #     Update Model       #
             #     if specified       #
             # ====================== #
             
             if self.continuedTraining == True:
-                
-                Xs = []
-                for var in self.variables:
-                    Xs.append(FindConditions(data, testDay, var))
+
                 X.append(Xs)    
                 
                 if nextDayPerformance > 0: y.append(1)       
@@ -179,9 +176,9 @@ class Backtest:
                 model.fit(XX, yy)
         
         # Save for vizualization purposes
-        self.XX         = XX
-        self.yy         = yy
-        self.model      = model
+        self.XX    = XX
+        self.yy    = yy
+        self.model = model
                 
     def buyStats(self):
         try: return round((float(self.correctBuys)/self.totalBuys)*100,2)
