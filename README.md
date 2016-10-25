@@ -115,11 +115,11 @@ Sell Accuracy: <strong style="color: green;">70.41%</strong>
 from clairvoyant import Portfolio
 from pandas import read_csv
 
-variables  = ["SSO", "SSC"]      # Financial indicators of choice
+variables  = ["SSO", "SSC"]     # Financial indicators of choice
 trainStart = '2013-03-01'       # Start of training period
 trainEnd   = '2015-07-15'       # End of training period
 testStart  = '2015-07-16'       # Start of testing period
-testEnd    = '2016-07-17'       # End of training period
+testEnd    = '2016-09-17'       # End of training period
 buyThreshold  = 0.65            # Confidence threshold for predicting buy (default = 0.65) 
 sellThreshold = 0.65            # Confidence threshold for predicting sell (default = 0.65)
 C = 1                           # Penalty parameter (default = 1)
