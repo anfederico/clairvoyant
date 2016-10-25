@@ -1,5 +1,6 @@
 <p align="center"><img src="https://github.com/anfederico/Clairvoyant/blob/master/media/Clairvoyant.png" width=60%></p>
 
+
 [![PyPI version](https://badge.fury.io/py/clairvoyant.svg)](https://badge.fury.io/py/clairvoyant)
 [![Build Status](https://travis-ci.org/anfederico/Clairvoyant.svg?branch=master)](https://travis-ci.org/anfederico/Clairvoyant)
 ![Dependencies](https://img.shields.io/badge/dependencies-up%20to%20date-brightgreen.svg)
@@ -65,13 +66,13 @@ for stock in stocks:
     backtest.stocks.append(stock)
     for i in range(0,10):
         backtest.runModel(data)
+
+backtest.displayConditions()
+backtest.displayStats()        
 ```
 
 #### View Results
-```python
-backtest.displayConditions()
-backtest.displayStats()
-```
+
 <pre>
 <b>Conditions</b>
 X1: SSO
@@ -108,17 +109,45 @@ Sell Accuracy: <strong style="color: green;">70.41%</strong>
 </pre>
 
 
-#### Visualize Model
-```python
-backtest.visualizeModel()
-```
-
 #### Portfolio Simulation
 
 ```python
+from clairvoyant import Portfolio
+from pandas import read_csv
 
+variables  = ["SSO", "SC"]      # Financial indicators of choice
+trainStart = '2013-03-01'       # Start of training period
+trainEnd   = '2015-07-15'       # End of training period
+testStart  = '2015-07-16'       # Start of testing period
+testEnd    = '2016-07-17'       # End of training period
+buyThreshold  = 0.65            # Confidence threshold for predicting buy (default = 0.65) 
+sellThreshold = 0.65            # Confidence threshold for predicting sell (default = 0.65)
+C = 1                           # Penalty parameter (default = 1)
+gamma = 10                      # Kernel coefficient (default = 10)
+continuedTraining = False       # Continue training during testing period? (default = false)
+startingBalance = 1000000       # Starting balance of portfolio
 
+# User defined trading logic (see below)
+def buyLogic(self, confidence, data, testDay)
+def sellLogic(self, confidence, data, testDay)
+def nextDayLogic(self, prediction, nextDayPerformance, data, testDay)
+
+portfolio = Portfolio(variables, trainStart, trainEnd, testStart, testEnd)
+
+data = read_csv("Stocks/SBUX.csv")
+data = data.round(3)
+for i in range(0,5):
+    portfolio.runModel(data, startingBalance, buyLogic, sellLogic, nextDayLogic)
+    portfolio.displayLastRun()
+
+portfolio.displayAllRuns()
 ```
+
+#### View Results
+
+<pre>
+
+</pre>
 
 ## Other Features
 
@@ -131,20 +160,9 @@ variables = ["SSO", "SSC", "RSI", ... , Xn]    # n features
 
 ```
 
-#### User Defined Trading Logic
+#### Visualize Model
 ```python
-
+backtest.visualizeModel()
 ```
-
-#### Continue Training
-```python
-continuedTraining = False:    # Don't Update model during testing period
-continuedTraining = True:     # Update model during testing period (runtime increase)
-```
-
-#### Modify learning parameters
-```python
-C = 1:                        # Penalty parameter C of the error term.
-gamma = 10:                   # Kernel coefficient for radial basis function
-```
+<img src="https://github.com/anfederico/Clairvoyant/blob/master/media/SBUX.png" width=50%>
 
