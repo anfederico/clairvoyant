@@ -17,10 +17,15 @@ Using stock historical data, train a supervised learning algorithm with any comb
 #### Visualize the Learning Process
 <img src="https://github.com/anfederico/Waldo/blob/master/media/TSLA.gif" width=50%>
 
+<br>
+
 ## Install
 ```python
 pip install clairvoyant
 ```
+
+<br>
+
 ## Code Examples
 
 #### Backtesting Signal Accuracy
@@ -38,7 +43,7 @@ variables  = ["SSO", "SSC"]     # Financial indicators of choice
 trainStart = '2013-03-01'       # Start of training period
 trainEnd   = '2015-07-15'       # End of training period
 testStart  = '2015-07-16'       # Start of testing period
-testEnd    = '2016-09-17'       # End of training period
+testEnd    = '2016-07-16'       # End of training period
 buyThreshold  = 0.65            # Confidence threshold for predicting buy (default = 0.65) 
 sellThreshold = 0.65            # Confidence threshold for predicting sell (default = 0.65)
 C = 1                           # Penalty parameter (default = 1)
@@ -72,7 +77,6 @@ backtest.displayStats()
 ```
 
 #### View Results
-
 <pre>
 <b>Conditions</b>
 X1: SSO
@@ -108,24 +112,27 @@ Total Sells: 20
 Sell Accuracy: <strong style="color: green;">70.41%</strong>
 </pre>
 
-
 #### Portfolio Simulation
+Once you've established your model can accurately predict price movement a day in advance, 
+simulate a portfolio and test your performance with a particular stock. User definited trading logic
+lets you control the flow of your capital based on the model's confidence in its prediction
+and the following next day outcome.
 
 ```python
 from clairvoyant import Portfolio
 from pandas import read_csv
 
-variables  = ["SSO", "SSC"]     # Financial indicators of choice
-trainStart = '2013-03-01'       # Start of training period
-trainEnd   = '2015-07-15'       # End of training period
-testStart  = '2015-07-16'       # Start of testing period
-testEnd    = '2016-09-17'       # End of training period
-buyThreshold  = 0.65            # Confidence threshold for predicting buy (default = 0.65) 
-sellThreshold = 0.65            # Confidence threshold for predicting sell (default = 0.65)
-C = 1                           # Penalty parameter (default = 1)
-gamma = 10                      # Kernel coefficient (default = 10)
-continuedTraining = False       # Continue training during testing period? (default = false)
-startingBalance = 1000000       # Starting balance of portfolio
+variables  = ["SSO", "SSC", "SSL"]   # Financial indicators of choice
+trainStart = '2013-03-01'            # Start of training period
+trainEnd   = '2015-07-15'            # End of training period
+testStart  = '2015-07-16'            # Start of testing period
+testEnd    = '2016-07-16'            # End of training period
+buyThreshold  = 0.65                 # Confidence threshold for predicting buy (default = 0.65) 
+sellThreshold = 0.65                 # Confidence threshold for predicting sell (default = 0.65)
+C = 1                                # Penalty parameter (default = 1)
+gamma = 10                           # Kernel coefficient (default = 10)
+continuedTraining = False            # Continue training during testing period? (default = false)
+startingBalance = 1000000            # Starting balance of portfolio
 
 # User defined trading logic (see below)
 def buyLogic(self, confidence, data, testDay)
@@ -134,7 +141,7 @@ def nextDayLogic(self, prediction, nextDayPerformance, data, testDay)
 
 portfolio = Portfolio(variables, trainStart, trainEnd, testStart, testEnd)
 
-data = read_csv("Stocks/SBUX.csv")
+data = read_csv("Stocks/YHOO.csv")
 data = data.round(3)
 for i in range(0,5):
     portfolio.runModel(data, startingBalance, buyLogic, sellLogic, nextDayLogic)
@@ -144,25 +151,75 @@ portfolio.displayAllRuns()
 ```
 
 #### View Results
-
 <pre>
-
+<b>Run #1</b>
+Buying Power: $664488.82
+Shares: 10682
+Total Value: $<strong style="color: green;">1130971.76</strong>
+<b>Run #2</b>
+Buying Power: $588062.6
+Shares: 10654
+Total Value: $<strong style="color: green;">1053322.78</strong>
+<b>Run #3</b>
+Buying Power: $787542.42
+Shares: 7735
+Total Value: $<strong style="color: green;">1125329.87</strong>
+<b>Run #4</b>
+Buying Power: $783145.32
+Shares: 7692
+Total Value: $<strong style="color: green;">1119054.96</strong>
+<b>Run #5</b>
+Buying Power: $648025.83
+Shares: 10418
+Total Value: $<strong style="color: green;">1102979.9</strong>
+<br>
+<b>Performance across all runs</b>
+Runs: 5
+Average Performance: <strong style="color: green;">10.63%</strong>
 </pre>
 
-## Other Features
+<br>
 
-#### Multivariate Functionality
-```python
-variables = ["SSO"]                            # 1 feature
-variables = ["SSO", "SSC"]                     # 2 features
-variables = ["SSO", "SSC", "RSI"]              # 3 features
-variables = ["SSO", "SSC", "RSI", ... , Xn]    # n features
-
-```
+## Examples continued...
 
 #### Visualize Model
+This feature will give you an immediate sense of how predictable your data is.
 ```python
 backtest.visualizeModel()
 ```
 <img src="https://github.com/anfederico/Clairvoyant/blob/master/media/SBUX.png" width=50%>
 
+#### User Defined Trading Logic
+These functions will tell your portfolio simulation how to trade. We tried to balance simplicity and
+functionality to allow for intricate trading strategies.
+```python
+
+```
+
+#### Multivariate Functionality
+Remember, more is not always better!
+```python
+variables = ["SSO"]                            # 1 feature
+variables = ["SSO", "SSC"]                     # 2 features
+variables = ["SSO", "SSC", "RSI"]              # 3 features
+variables = ["SSO", "SSC", "RSI", ... , Xn]    # n features
+```
+
+#### Flexible Data Handling
+Download historical data directly from popular distrubution sources. Clairvoyant is 
+flexible with most date formats and will ignore unused columns in the dataset. If it
+can't find the date specified, it will choose a suitable alternative.
+```text
+Date,Open,High,Low,Close,Volume,SSO,SCC
+03/01/2013,27.72,27.98,27.52,27.95,34851872,65.7894736842,-0.121
+03/04/2013,27.85,28.15,27.7,28.15,38167504,75.9450171821,0.832
+03/05/2013,28.29,28.54,28.16,28.35,41437136,84.9230769231,0.151
+03/06/2013,28.21,28.23,27.78,28.09,51448912,80.7799442897,-0.689
+03/07/2013,28.11,28.28,28.005,28.14,29197632,73.5368956743,-0.821
+```
+#### Social Sentiment Scores
+The examples shown use data derived from a project where we are data mining 
+social media and performing stock sentiment analysis. 
+```
+https://github.com/anfederico/Stocktalk
+```
