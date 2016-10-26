@@ -10,11 +10,11 @@
 
 ## Basic Overview
 
-#### Schematic
 Using stock historical data, train a supervised learning algorithm with any combination of financial indicators. Rapidly backtest your model for accuracy and simulate investment portfolio performance. 
 <p align="center"><img src="https://github.com/anfederico/Waldo/blob/master/media/Schematic.png" width=100%></p>
 
-#### Visualize the Learning Process
+
+## Visualize the Learning Process
 <img src="https://github.com/anfederico/Waldo/blob/master/media/TSLA.gif" width=50%>
 
 <br>
