@@ -1,4 +1,4 @@
-<p align="center"><img src="https://github.com/anfederico/Clairvoyant/blob/master/media/Clairvoyant.png" width=60%></p>
+<p align="center"><img width=60% src="https://github.com/anfederico/Clairvoyant/blob/master/media/Clairvoyant.png"></p>
 
 
 [![PyPI version](https://badge.fury.io/py/clairvoyant.svg)](https://badge.fury.io/py/clairvoyant)
@@ -11,8 +11,7 @@
 ## Basic Overview
 
 Using stock historical data, train a supervised learning algorithm with any combination of financial indicators. Rapidly backtest your model for accuracy and simulate investment portfolio performance. 
-<p align="center"><img src="https://github.com/anfederico/Waldo/blob/master/media/Schematic.png" width=100%></p>
-
+<p align="center"><img width=95% src="https://github.com/anfederico/Waldo/blob/master/media/Schematic.png"></p>
 
 ## Visualize the Learning Process
 <img src="https://github.com/anfederico/Waldo/blob/master/media/TSLA.gif" width=50%>
