@@ -195,7 +195,60 @@ backtest.visualizeModel()
 These functions will tell your portfolio simulation how to trade. We tried to balance simplicity and
 functionality to allow for intricate trading strategies.
 ```python
+def buyLogic(self, confidence, data, testDay): 
+    quote = data["Close"][testDay]                           # Leave as is
+    
+    if confidence >= 0.75:                                   # If model signals buy
+        shareOrder = int((self.buyingPower*0.3)/quote)       # and is 75-100% confident
+        self.buyShares(shareOrder, quote)                    # invest 30% of buying power    
+        
+    elif confidence >= 0.70:                                 # If model is 70-75% confident
+        shareOrder = int((self.buyingPower*0.2)/quote)       # invest 20% of buying power
+        self.buyShares(shareOrder, quote)
 
+    elif confidence >= 0.65:                                 # If model is 65-70% confident
+        shareOrder = int((self.buyingPower*0.1)/quote)       # invest 10% of buying power
+        self.buyShares(shareOrder, quote)
+
+                                                        
+def sellLogic(self, confidence, data, testDay):
+    quote = data["Close"][testDay]                       
+    
+    if confidence >= 0.65:                                   # If model signals sell
+        self.sellShares(self.shares, quote)                  # and is 65-100% confident
+                                                             # sell all shares    
+
+def nextDayLogic(self, prediction, nextDayPerformance, data, testDay):
+    quote = data["Close"][testDay]                        
+                                                          
+    # Case 1: Prediction is buy, price increases
+    if prediction == 1 and nextDayPerformance > 0:
+        
+        if nextDayPerformance >= 0.025:                      # If I bought shares
+            self.sellShares(self.shares, quote)              # and price increases >= 2.5%
+                                                             # sell all shares
+                            
+    # Case 2: Prediction is buy, price decreases
+    elif prediction == 1 and nextDayPerformance <= 0: pass 
+
+                                                             # If I bought shares
+                                                             # and price decreases
+                                                             # hold position
+    
+    # Case 3: Prediction is sell, price decreases
+    elif prediction == -1 and nextDayPerformance <= 0:
+        
+        if nextDayPerformance <= -0.025:                     # If I sold shares
+            shareOrder = int((self.buyingPower*0.2)/quote)   # and price decreases >= 2.5%
+            self.buyShares(shareOrder, quote)                # reinvest 20% of buying power
+    
+    # Case 4: Prediction is sell, price increases
+    elif prediction == -1 and nextDayPerformance > 0: pass
+            
+                                                             # If I sold shares
+                                                             # and price increases
+                                                             # hold position
+    # Case 5: No confident prediction was made
 ```
 
 #### Multivariate Functionality
