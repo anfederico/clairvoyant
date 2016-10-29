@@ -6,11 +6,3 @@ before_install: sudo apt-get install -qq python-numpy python-scipy
 install: pip install -r requirements.txt
 
 script: echo "TODO"
-
-deploy:
-  provider: pypi
-  user: anfederico
-  password:
-    secure: "FZ4nbyo2HaIxe9CWpBSegDGDbw38N7zzoE/9/csqbvy1u6+9HzBZJeKQtAaCtXh5aPITtpLz9WjGH2Fx9rP06LMa8FOCkSB6w8wr14UTI+5517+1zyBYpRKvgf9QXIlHGw/qmmp0MYXVPoV4EAtwjp0TRkgDc2tRvG/0tW6XbmMQ8k6+18BZWjNmtnpNLwPkZAbdeRlVq1HtuJXdum1zMbgU2VqNUtM1EUjaF72rfnwXizNhvP33707sSYO23t8+qLhvMTXRKys3Vxp5O9+E4k2FTKPSmOwFsyDpmHTPAtDuraF5ftpQ0swu4muchvoILdh48lRW5iSWeGZpFIJ0wDvy6y+NnkoUXY3EL9F41T1xMgzBnp5GChNlTx2xICVTwyTcS5Owc6nlWJwnW5dUhMms9jGhvK4ueI2lGUVyyQDYiJ5vilkSy1d5u6XBLtgSpzYyHU91nEnyokPhieYBF5gwswjTdBtzeTN5XfuZxiBpUyzj8cS+4X26EvVjnQbEziYkyBlyx362Bn2yj7UNjy7crtF5XalZvCcjGyCC/N8hvVgz8I+8ggK/LisrZmYLFDXaEBVf0L9aDL1iOa8lPgzuD09CYFSWGpPWyEJeIqOp041FeGwKD3nnaOcZOFGszkH1B51je10tLt7uB/MuT5ejQFqHgfXKkIFvBzO8A6k="
-  on:
-    tags: true
