@@ -116,7 +116,7 @@ Sell Accuracy: <strong style="color: green;">70.41%</strong>
 
 #### Portfolio Simulation
 Once you've established your model can accurately predict price movement a day in advance, 
-simulate a portfolio and test your performance with a particular stock. User definited trading logic
+simulate a portfolio and test your performance with a particular stock. User defined trading logic
 lets you control the flow of your capital based on the model's confidence in its prediction
 and the following next day outcome.
 
@@ -261,7 +261,7 @@ variables = ["SSO", "SSC", "RSI", ... , Xn]    # n features
 ```
 
 #### Flexible Data Handling
-Download historical data directly from popular distrubution sources. Clairvoyant is 
+Download historical data directly from popular distribution sources. Clairvoyant is 
 flexible with most date formats and will ignore unused columns in the dataset. If it
 can't find the date specified, it will choose a suitable alternative.
 ```text
