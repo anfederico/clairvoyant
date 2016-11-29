@@ -177,6 +177,8 @@ class Backtest:
 
                 XX = vstack(X)
                 yy = hstack(y)
+                self.scaler = RobustScaler().fit(XX)
+                
                 model.fit(self.scaler.transform(XX), yy)
 
         # Save for vizualization purposes
