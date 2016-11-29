@@ -177,7 +177,7 @@ class Backtest:
 
                 XX = vstack(X)
                 yy = hstack(y)
-                model.fit(XX, yy)
+                model.fit(self.scaler.transform(XX), yy)
 
         # Save for vizualization purposes
         self.XX    = XX
