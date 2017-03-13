@@ -1,2 +1,2 @@
-from Backtest import Backtest
-from Portfolio import Portfolio
+from . import Backtest, Portfolio
+__all__ = ['Backtest', 'Portfolio']
