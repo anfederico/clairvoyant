@@ -11,31 +11,8 @@ from numpy                 import vstack, hstack
 from csv                   import DictWriter
 from pandas.tslib          import relativedelta
 from dateutil.parser       import parse
-
-def DateIndex(data, stock, date, end):
-    lowbound = data["Date"][0]
-    uppbound = data["Date"][len(data)-1]
-    while (date >= lowbound and date <= uppbound):
-        try:
-            return data.Date[data.Date == date].index[0]
-        except:
-            if not end:
-                date += relativedelta(days=1)
-            else:
-                date -= relativedelta(days=1)
-    raise ValueError("Couldn't find "+date.strftime('%m/%d/%Y')+" or suitable alternative in "+stock)
-
-def FindConditions(data, day, indicator):
-    return data[indicator][day]
-
-def PercentChange(data, day):
-    return (data["Close"][day] - data["Open"][day]) / data["Open"][day]
-
-def Predict(model, Xs):
-    prediction = model.predict_proba([Xs])[0]
-    negative = prediction[0]
-    positive = prediction[1]
-    return negative, positive
+from clairvoyant.utils     import (DateIndex, FindConditions, PercentChange,
+                                   Predict)
 
 class Backtest:
 
@@ -72,10 +49,10 @@ class Backtest:
         data['Date'] = to_datetime(data['Date'])
         stock = self.stocks[len(self.stocks)-1]
 
-        trainStart = DateIndex(data, stock, self.trainStart, False)
-        trainEnd   = DateIndex(data, stock, self.trainEnd, True)
-        testStart  = DateIndex(data, stock, self.testStart, False)
-        testEnd    = DateIndex(data, stock, self.testEnd, True)
+        trainStart = DateIndex(data, self.trainStart, False, stock)
+        trainEnd   = DateIndex(data, self.trainEnd, True, stock)
+        testStart  = DateIndex(data, self.testStart, False, stock)
+        testEnd    = DateIndex(data, self.testEnd, True, stock)
 
         self.dates.append([data['Date'][trainStart].strftime('%m/%d/%Y'),
                            data['Date'][trainEnd].strftime('%m/%d/%Y'),
