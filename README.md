@@ -1,23 +1,20 @@
-<p align="center"><img width=12.5% src="https://github.com/anfederico/Clairvoyant/blob/master/media/Logo.png"></p>
-<p align="center"><img width=60% src="https://github.com/anfederico/Clairvoyant/blob/master/media/Clairvoyant.png"></p>
+<p align="center"><img width=12.5% src="https://github.com/uclatommy/Clairvoyant/blob/master/media/Logo.png"></p>
+<p align="center"><img width=60% src="https://github.com/uclatommy/Clairvoyant/blob/master/media/Clairvoyant.png"></p>
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-[![PyPI version](https://badge.fury.io/py/clairvoyant.svg)](https://badge.fury.io/py/clairvoyant)
-[![Build Status](https://travis-ci.org/anfederico/Clairvoyant.svg?branch=master)](https://travis-ci.org/anfederico/Clairvoyant)
-![Dependencies](https://img.shields.io/badge/dependencies-up%20to%20date-brightgreen.svg)
-[![GitHub Issues](https://img.shields.io/github/issues/anfederico/Clairvoyant.svg)](https://github.com/anfederico/Clairvoyant/issues)
-![Contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg)
+[![Build Status](https://travis-ci.org/uclatommy/Clairvoyant.svg?branch=master)](https://travis-ci.org/uclatommy/Clairvoyant)
+[![GitHub Issues](https://img.shields.io/github/issues/uclatommy/Clairvoyant.svg)](https://github.com/uclatommy/Clairvoyant/issues)
 [![License](https://img.shields.io/badge/license-MIT%20License-brightgreen.svg)](https://opensource.org/licenses/MIT)
 
 ## Basic Overview
 
-Using stock historical data, train a supervised learning algorithm with any combination of financial indicators. Rapidly backtest your model for accuracy and simulate investment portfolio performance. 
+Using stock historical data, train a supervised learning algorithm with any combination of financial indicators. Rapidly backtest your model for accuracy and simulate investment portfolio performance.
 <p align="center"><img width=95% src="https://github.com/anfederico/Waldo/blob/master/media/Schematic.png"></p>
 
 <br>
 
 ## Visualize the Learning Process
-<img src="https://github.com/anfederico/Clairvoyant/blob/master/media/Learning.gif" width=40%>
+<img src="https://github.com/ucaltommy/Clairvoyant/blob/master/media/Learning.gif" width=40%>
 
 <br>
 
@@ -46,7 +43,7 @@ trainStart = '2013-03-01'       # Start of training period
 trainEnd   = '2015-07-15'       # End of training period
 testStart  = '2015-07-16'       # Start of testing period
 testEnd    = '2016-07-16'       # End of testing period
-buyThreshold  = 0.65            # Confidence threshold for predicting buy (default = 0.65) 
+buyThreshold  = 0.65            # Confidence threshold for predicting buy (default = 0.65)
 sellThreshold = 0.65            # Confidence threshold for predicting sell (default = 0.65)
 C = 1                           # Penalty parameter (default = 1)
 gamma = 10                      # Kernel coefficient (default = 10)
@@ -63,8 +60,8 @@ for i in range(0,10):                   # Run the model 10-15 times
 # Testing performance across multiple stocks
 
 stocks = ["AAPL", "ADBE", "AMGN", "AMZN",
-          "BIIB", "EBAY", "GILD", "GRPN", 
-          "INTC", "JBLU", "MSFT", "NFLX", 
+          "BIIB", "EBAY", "GILD", "GRPN",
+          "INTC", "JBLU", "MSFT", "NFLX",
           "SBUX", "TSLA", "VRTX", "YHOO"]
 
 for stock in stocks:
@@ -115,7 +112,7 @@ Sell Accuracy: <strong style="color: green;">70.41%</strong>
 </pre>
 
 #### Portfolio Simulation
-Once you've established your model can accurately predict price movement a day in advance, 
+Once you've established your model can accurately predict price movement a day in advance,
 simulate a portfolio and test your performance with a particular stock. User defined trading logic
 lets you control the flow of your capital based on the model's confidence in its prediction
 and the following next day outcome.
@@ -129,7 +126,7 @@ trainStart = '2013-03-01'            # Start of training period
 trainEnd   = '2015-07-15'            # End of training period
 testStart  = '2015-07-16'            # Start of testing period
 testEnd    = '2016-07-16'            # End of testing period
-buyThreshold  = 0.65                 # Confidence threshold for predicting buy (default = 0.65) 
+buyThreshold  = 0.65                 # Confidence threshold for predicting buy (default = 0.65)
 sellThreshold = 0.65                 # Confidence threshold for predicting sell (default = 0.65)
 C = 1                                # Penalty parameter (default = 1)
 gamma = 10                           # Kernel coefficient (default = 10)
@@ -189,19 +186,19 @@ This feature will give you an immediate sense of how predictable your data is.
 ```python
 backtest.visualizeModel()
 ```
-<img src="https://github.com/anfederico/Clairvoyant/blob/master/media/SBUX.png" width=50%>
+<img src="https://github.com/uclatommy/Clairvoyant/blob/master/media/SBUX.png" width=50%>
 
 #### User Defined Trading Logic
 These functions will tell your portfolio simulation how to trade. We tried to balance simplicity and
 functionality to allow for intricate trading strategies.
 ```python
-def buyLogic(self, confidence, data, testDay): 
+def buyLogic(self, confidence, data, testDay):
     quote = data["Close"][testDay]                           # Leave as is
-    
+
     if confidence >= 0.75:                                   # If model signals buy
         shareOrder = int((self.buyingPower*0.3)/quote)       # and is 75-100% confident
         self.buyShares(shareOrder, quote)                    # invest 30% of buying power    
-        
+
     elif confidence >= 0.70:                                 # If model is 70-75% confident
         shareOrder = int((self.buyingPower*0.2)/quote)       # invest 20% of buying power
         self.buyShares(shareOrder, quote)
@@ -210,41 +207,41 @@ def buyLogic(self, confidence, data, testDay):
         shareOrder = int((self.buyingPower*0.1)/quote)       # invest 10% of buying power
         self.buyShares(shareOrder, quote)
 
-                                                        
+
 def sellLogic(self, confidence, data, testDay):
     quote = data["Close"][testDay]                       
-    
+
     if confidence >= 0.65:                                   # If model signals sell
         self.sellShares(self.shares, quote)                  # and is 65-100% confident
                                                              # sell all shares    
 
 def nextDayLogic(self, prediction, nextDayPerformance, data, testDay):
     quote = data["Close"][testDay]                        
-                                                          
+
     # Case 1: Prediction is buy, price increases
     if prediction == 1 and nextDayPerformance > 0:
-        
+
         if nextDayPerformance >= 0.025:                      # If I bought shares
             self.sellShares(self.shares, quote)              # and price increases >= 2.5%
                                                              # sell all shares
-                            
+
     # Case 2: Prediction is buy, price decreases
-    elif prediction == 1 and nextDayPerformance <= 0: pass 
+    elif prediction == 1 and nextDayPerformance <= 0: pass
 
                                                              # If I bought shares
                                                              # and price decreases
                                                              # hold position
-    
+
     # Case 3: Prediction is sell, price decreases
     elif prediction == -1 and nextDayPerformance <= 0:
-        
+
         if nextDayPerformance <= -0.025:                     # If I sold shares
             shareOrder = int((self.buyingPower*0.2)/quote)   # and price decreases >= 2.5%
             self.buyShares(shareOrder, quote)                # reinvest 20% of buying power
-    
+
     # Case 4: Prediction is sell, price increases
     elif prediction == -1 and nextDayPerformance > 0: pass
-            
+
                                                              # If I sold shares
                                                              # and price increases
                                                              # hold position
@@ -261,7 +258,7 @@ variables = ["SSO", "SSC", "RSI", ... , Xn]    # n features
 ```
 
 #### Flexible Data Handling
-Download historical data directly from popular distribution sources. Clairvoyant is 
+Download historical data directly from popular distribution sources. Clairvoyant is
 flexible with most date formats and will ignore unused columns in the dataset. If it
 can't find the date specified, it will choose a suitable alternative.
 ```text
@@ -273,8 +270,8 @@ Date,Open,High,Low,Close,Volume,SSO,SCC
 03/07/2013,28.11,28.28,28.005,28.14,29197632,73.5368956743,-0.821
 ```
 #### Social Sentiment Scores
-The examples shown use data derived from a project where we are data mining 
-social media and performing stock sentiment analysis. 
+The examples shown use data derived from a project where we are data mining
+social media and performing stock sentiment analysis.
 ```
-https://github.com/anfederico/Stocktalk
+https://github.com/uclatommy/TweetFeels
 ```
