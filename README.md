@@ -2,9 +2,11 @@
 <p align="center"><img width=60% src="https://github.com/uclatommy/Clairvoyant/blob/master/media/Clairvoyant.png"></p>
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<p align="center">
 [![Build Status](https://travis-ci.org/uclatommy/Clairvoyant.svg?branch=master)](https://travis-ci.org/uclatommy/Clairvoyant)
 [![GitHub Issues](https://img.shields.io/github/issues/uclatommy/Clairvoyant.svg)](https://github.com/uclatommy/Clairvoyant/issues)
 [![License](https://img.shields.io/badge/license-MIT%20License-brightgreen.svg)](https://opensource.org/licenses/MIT)
+</p>
 
 ## Basic Overview
 
@@ -14,7 +16,7 @@ Using stock historical data, train a supervised learning algorithm with any comb
 <br>
 
 ## Visualize the Learning Process
-<img src="https://github.com/ucaltommy/Clairvoyant/blob/master/media/Learning.gif" width=40%>
+<img src="https://github.com/anfederico/Clairvoyant/blob/master/media/Learning.gif" width=40%>
 
 <br>
 
