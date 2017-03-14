@@ -1,11 +1,16 @@
 <p align="center"><img width=12.5% src="https://github.com/uclatommy/Clairvoyant/blob/master/media/Logo.png"></p>
 <p align="center"><img width=60% src="https://github.com/uclatommy/Clairvoyant/blob/master/media/Clairvoyant.png"></p>
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 <p align="center">
-[![Build Status](https://travis-ci.org/uclatommy/Clairvoyant.svg?branch=master)](https://travis-ci.org/uclatommy/Clairvoyant)
-[![GitHub Issues](https://img.shields.io/github/issues/uclatommy/Clairvoyant.svg)](https://github.com/uclatommy/Clairvoyant/issues)
-[![License](https://img.shields.io/badge/license-MIT%20License-brightgreen.svg)](https://opensource.org/licenses/MIT)
+<a href="https://travis-ci.org/uclatommy/Clairvoyant">
+    <image src="https://travis-ci.org/uclatommy/Clairvoyant.svg?branch=master">
+</a>
+<a href="https://github.com/uclatommy/Clairvoyant/issues">
+     <img src="https://img.shields.io/github/issues/uclatommy/Clairvoyant.svg">
+</a>
+<a href="https://opensource.org/licenses/MIT">
+     <img src="https://img.shields.io/badge/license-MIT%20License-brightgreen.svg">
+</a>
 </p>
 
 ## Basic Overview
