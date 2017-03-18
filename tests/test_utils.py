@@ -15,25 +15,30 @@ class Test_Utils(unittest.TestCase):
             {'Date': [to_datetime(dt) for dt in dates],
              'SSO': SSO, 'SSC': SSC, 'Open': o, 'Close': c }
         )
+        self.data2 = pd.read_csv('tests/tsla-sentiment.csv')
+        self.data2 = self.data2.rename(columns={'Unnamed: 0': 'Date'})
+        self.data2.Date = to_datetime(self.data2.Date)
 
     def test_date_index(self):
         date = to_datetime('2017-01-03')
         self.assertEqual(cvt.utils.DateIndex(self.data, date, True), 2)
         date = to_datetime('2017-01-06')
         self.assertEqual(cvt.utils.DateIndex(self.data, date, False), 6)
+        date = to_datetime('2017-02-23 06:45:00')
+        self.assertEqual(cvt.utils.DateIndex(self.data2, date, True), 1)
+
 
     def test_find_conditions(self):
-        self.data.set_index('Date', inplace=True)
-        ssc = cvt.utils.FindConditions(
-            self.data, to_datetime('2017-01-02'), 'SSC'
-        )
+        print(self.data.head())
+        day = cvt.utils.DateIndex(self.data, to_datetime('2017-01-02'), False)
+        ssc = cvt.utils.FindConditions(self.data, day, 'SSC')
         self.assertEqual(ssc, 200)
-        sso = cvt.utils.FindConditions(
-            self.data, to_datetime('2017-01-06'), 'SSO'
-        )
+        day = cvt.utils.DateIndex(self.data, to_datetime('2017-01-06'), False)
+        sso = cvt.utils.FindConditions(self.data, day, 'SSO')
         self.assertEqual(sso, 0.9)
 
+
     def test_percent_change(self):
-        self.data.set_index('Date', inplace=True)
-        delta = cvt.utils.PercentChange(self.data, to_datetime('2017-01-02'))
+        day = cvt.utils.DateIndex(self.data, to_datetime('2017-01-02'), False)
+        delta = cvt.utils.PercentChange(self.data, day)
         self.assertEqual(delta, 0.01)

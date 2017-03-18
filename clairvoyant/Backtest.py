@@ -9,21 +9,23 @@ from sklearn.preprocessing import StandardScaler
 from pandas                import read_csv, to_datetime
 from numpy                 import vstack, hstack
 from csv                   import DictWriter
-from pandas.tslib          import relativedelta
 from dateutil.parser       import parse
+from pytz                  import timezone
 from clairvoyant.utils     import (DateIndex, FindConditions, PercentChange,
                                    Predict)
 
 class Backtest:
 
-    def __init__(self, variables, trainStart, trainEnd, testStart, testEnd, buyThreshold = 0.65, sellThreshold = 0.65, C = 1, gamma = 10, continuedTraining = False):
+    def __init__(self, variables, trainStart, trainEnd, testStart, testEnd,
+                 buyThreshold = 0.65, sellThreshold = 0.65, C = 1, gamma = 10,
+                 continuedTraining = False, tz=timezone('UTC')):
 
         # Conditions
         self.variables          = variables
-        self.trainStart         = to_datetime(trainStart)
-        self.trainEnd           = to_datetime(trainEnd)
-        self.testStart          = to_datetime(testStart)
-        self.testEnd            = to_datetime(testEnd)
+        self.trainStart         = tz.localize(to_datetime(trainStart))
+        self.trainEnd           = tz.localize(to_datetime(trainEnd))
+        self.testStart          = tz.localize(to_datetime(testStart))
+        self.testEnd            = tz.localize(to_datetime(testEnd))
         self.buyThreshold       = buyThreshold
         self.sellThreshold      = sellThreshold
         self.C                  = C
@@ -44,9 +46,6 @@ class Backtest:
         self.model              = None
 
     def runModel(self, data):
-
-        # Configure dates
-        data['Date'] = to_datetime(data['Date'])
         stock = self.stocks[len(self.stocks)-1]
 
         trainStart = DateIndex(data, self.trainStart, False, stock)
@@ -68,10 +67,10 @@ class Backtest:
 
             Xs = []
             for var in self.variables:                      # Handles n variables
-                Xs.append(FindConditions(data, i, var))     # Find conditions for day 1
+                Xs.append(FindConditions(data, i, var))     # Find conditions for Period 1
             X.append(Xs)
 
-            y1 = PercentChange(data, i+1)                   # Find the stock price movement for day 2
+            y1 = PercentChange(data, i+1)                   # Find the stock price movement for Period 2
             if y1 > 0: y.append(1)                          # If it went up, classify as 1
             else:      y.append(0)                          # If it went down, classify as 0
 
@@ -85,18 +84,18 @@ class Backtest:
         #         Testing        #
         # ====================== #
 
-        testDay = testStart
-        while (testDay < testEnd):
+        testPeriod = testStart
+        while (testPeriod < testEnd):
 
             # ==================================== #
-            #  DAY 1 @ 8:00 PM | Markets closed    #
-            #  Make prediction for DAY 2           #
+            #  Period 1 @ 8:00 PM | Markets closed #
+            #  Make prediction for Period 2        #
             #  Update Buy/Sell count (or neither)  #
             # ==================================== #
 
             Xs = []
             for var in self.variables:
-                Xs.append(FindConditions(data, testDay, var))
+                Xs.append(FindConditions(data, testPeriod, var))
 
             neg, pos = Predict(model, Xs)
 
@@ -110,29 +109,29 @@ class Backtest:
             elif prediction == -1:
                 self.totalSells += 1
 
-            testDay += 1
+            testPeriod += 1
 
             # ==================================== #
-            #  DAY 2 @ 4:30 PM | Markets closed    #
-            #  Analyze results from DAY 2          #
+            #  Period 2 @ 4:30 PM | Markets closed #
+            #  Analyze results from Period 2       #
             #  Record if prediction was correct    #
             # ==================================== #
 
-            nextDayPerformance = PercentChange(data, testDay)
+            nextPeriodPerformance = PercentChange(data, testPeriod)
 
-            # Case 1: Prediction is positive (buy), next day performance is positive
-            if prediction == 1 and nextDayPerformance > 0:
+            # Case 1: Prediction is positive (buy), next Period performance is positive
+            if prediction == 1 and nextPeriodPerformance > 0:
                 self.correctBuys += 1
 
-            # Case 2: Prediction is positive (buy), next day performance is negative
-            elif prediction == 1 and nextDayPerformance <= 0: pass
+            # Case 2: Prediction is positive (buy), next Period performance is negative
+            elif prediction == 1 and nextPeriodPerformance <= 0: pass
 
-            # Case 3: Prediction is negative (sell), next day performance is negative
-            elif prediction == -1 and nextDayPerformance < 0:
+            # Case 3: Prediction is negative (sell), next Period performance is negative
+            elif prediction == -1 and nextPeriodPerformance < 0:
                 self.correctSells += 1
 
-            # Case 4: Prediction is negative (sell), next day performance is positive
-            elif prediction == -1 and nextDayPerformance >= 0: pass
+            # Case 4: Prediction is negative (sell), next Period performance is positive
+            elif prediction == -1 and nextPeriodPerformance >= 0: pass
 
             # Case 5: No confident prediction
 
@@ -145,7 +144,7 @@ class Backtest:
 
                 X.append(Xs)
 
-                if nextDayPerformance > 0: y.append(1)
+                if nextPeriodPerformance > 0: y.append(1)
                 else:                      y.append(0)
 
                 XX = vstack(X)
@@ -221,7 +220,7 @@ class Backtest:
         if len(self.variables) != 2:
             print("Error: Plotting is restricted to 2 dimensions")
             return
-        if (self.XX == None or self.yy == None or self.model == None):
+        if (self.XX is None or self.yy is None or self.model is None):
             print("Error: Please run model before visualizing")
             return
 
