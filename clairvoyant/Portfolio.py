@@ -3,44 +3,23 @@ from sklearn.preprocessing import StandardScaler
 from pandas                import read_csv, to_datetime
 from numpy                 import vstack, hstack
 from csv                   import DictWriter
-from pandas.tslib          import relativedelta
 from dateutil.parser       import parse
-
-def DateIndex(data, date, end):
-    lowbound = data["Date"][0]
-    uppbound = data["Date"][len(data)-1]
-    while (date >= lowbound and date <= uppbound):
-        try:
-            return data.Date[data.Date == date].index[0]
-        except:
-            if not end:
-                date += relativedelta(days=1)
-            else:
-                date -= relativedelta(days=1)
-    raise ValueError("Couldn't find "+date.strftime('%m/%d/%Y')+" or suitable alternative")
-
-def FindConditions(data, day, indicator):
-    return data[indicator][day]
-
-def PercentChange(data, day):
-    return (data["Close"][day] - data["Open"][day]) / data["Open"][day]
-
-def Predict(model, Xs):
-    prediction = model.predict_proba([Xs])[0]
-    negative = prediction[0]
-    positive = prediction[1]
-    return negative, positive
+from pytz                  import timezone
+from clairvoyant.utils     import (DateIndex, FindConditions, PercentChange,
+                                   Predict)
 
 class Portfolio:
 
-    def __init__(self, variables, trainStart, trainEnd, testStart, testEnd, buyThreshold = 0.65, sellThreshold = 0.65, C = 1, gamma = 10, continuedTraining = False):
+    def __init__(self, variables, trainStart, trainEnd, testStart, testEnd,
+                 buyThreshold = 0.65, sellThreshold = 0.65, C = 1, gamma = 10,
+                 continuedTraining = False, tz=timezone('UTC')):
 
         # Conditions
         self.variables          = variables
-        self.trainStart         = to_datetime(trainStart)
-        self.trainEnd           = to_datetime(trainEnd)
-        self.testStart          = to_datetime(testStart)
-        self.testEnd            = to_datetime(testEnd)
+        self.trainStart         = tz.localize(to_datetime(trainStart))
+        self.trainEnd           = tz.localize(to_datetime(trainEnd))
+        self.testStart          = tz.localize(to_datetime(testStart))
+        self.testEnd            = tz.localize(to_datetime(testEnd))
         self.buyThreshold       = buyThreshold
         self.sellThreshold      = sellThreshold
         self.C                  = C
@@ -57,10 +36,7 @@ class Portfolio:
         self.runs               = 0
         self.performances       = []
 
-    def runModel(self, data, startingBalance, buyLogic, sellLogic, nextDayLogic):
-
-        # Configure dates
-        data['Date'] = to_datetime(data['Date'])
+    def runModel(self, data, startingBalance, buyLogic, sellLogic, nextPeriodLogic):
 
         trainStart = DateIndex(data, self.trainStart, False)
         trainEnd   = DateIndex(data, self.trainEnd, True)
@@ -84,10 +60,10 @@ class Portfolio:
 
             Xs = []
             for var in self.variables:                      # Handles n variables
-                Xs.append(FindConditions(data, i, var))     # Find conditions for day 1
+                Xs.append(FindConditions(data, i, var))     # Find conditions for Period 1
             X.append(Xs)
 
-            y1 = PercentChange(data, i+1)                   # Find the stock price movement for day 2
+            y1 = PercentChange(data, i+1)                   # Find the stock price movement for Period 2
             if y1 > 0: y.append(1)                          # If it went up, classify as 1
             else:      y.append(0)                          # If it went down, classify as 0
 
@@ -101,18 +77,18 @@ class Portfolio:
         #         Testing        #
         # ====================== #
 
-        testDay = testStart
-        while (testDay < testEnd):
+        testPeriod = testStart
+        while (testPeriod < testEnd):
 
             # ==================================== #
-            #  DAY 1 @ 8:00 PM | Markets closed    #
-            #  Make prediction for DAY 2           #
+            #  Period 1 @ 8:00 PM | Markets closed #
+            #  Make prediction for Period 2        #
             #  Update Buy/Sell count (or neither)  #
             # ==================================== #
 
             Xs = []
             for var in self.variables:
-                Xs.append(FindConditions(data, testDay, var))
+                Xs.append(FindConditions(data, testPeriod, var))
 
             neg, pos = Predict(model, Xs)
 
@@ -121,22 +97,21 @@ class Portfolio:
             else: prediction = 0
 
             if prediction == 1:
-                buyLogic(self, pos, data, testDay)
+                buyLogic(self, pos, data, testPeriod)
 
             elif prediction == -1:
-                sellLogic(self, neg, data, testDay)
+                sellLogic(self, neg, data, testPeriod)
 
-            testDay += 1
+            testPeriod += 1
 
             # ==================================== #
-            #  DAY 2 @ 4:30 PM | Markets closed    #
-            #  Analyze results from DAY 2          #
+            #  Period 2 @ 4:30 PM | Markets closed #
+            #  Analyze results from Period 2       #
             #  Record if prediction was correct    #
             # ==================================== #
 
-            nextDayPerformance = PercentChange(data, testDay)
-
-            nextDayLogic(self, prediction, nextDayPerformance, data, testDay)
+            nextPeriodPerformance = PercentChange(data, testPeriod)
+            nextPeriodLogic(self, prediction, nextPeriodPerformance, data, testPeriod)
 
             # ====================== #
             #     Update Model       #
@@ -147,7 +122,7 @@ class Portfolio:
 
                 X.append(Xs)
 
-                if nextDayPerformance > 0: y.append(1)
+                if nextPeriodPerformance > 0: y.append(1)
                 else:                      y.append(0)
 
                 XX = vstack(X)
@@ -155,11 +130,11 @@ class Portfolio:
                 model.fit(XX, yy)
 
         # Record Performance
-        self.lastQuote = FindConditions(data, testDay, "Close")
-        self.performances.append(((self.portfolioValue(data, testDay)-self.startingBalance)/self.startingBalance)*100)
+        self.lastQuote = FindConditions(data, testPeriod, "Close")
+        self.performances.append(((self.portfolioValue(data, testPeriod)-self.startingBalance)/self.startingBalance)*100)
 
-    def portfolioValue(self, data, testDay):
-        quote = FindConditions(data, testDay, "Close")
+    def portfolioValue(self, data, testPeriod):
+        quote = FindConditions(data, testPeriod, "Close")
         return self.buyingPower+self.shares*quote
 
     def buyShares(self, shares, quote):
