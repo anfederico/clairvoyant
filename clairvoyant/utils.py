@@ -22,9 +22,3 @@ def FindConditions(data, period, indicator):
 
 def PercentChange(data, period):
     return (data["Close"][period] - data["Open"][period]) / data["Open"][period]
-
-def Predict(model, Xs):
-    prediction = model.predict_proba([Xs])[0]
-    negative = prediction[0]
-    positive = prediction[1]
-    return negative, positive
