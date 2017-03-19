@@ -15,7 +15,7 @@ class Backtest(Clair):
     def __init__(
             self, variables, trainStart, trainEnd, testStart, testEnd,
             buyThreshold=0.65, sellThreshold=0.65, C=1, gamma=10,
-            continuedTraining=False, tz=timezone('UTC')
+            continuedTraining=False, tz=timezone('UTC'), debug=False
             ):
 
         super().__init__(
@@ -34,11 +34,12 @@ class Backtest(Clair):
         self.increases = 0
         self.decreases = 0
         self.periods = 0
+        self.debug = debug
 
         # Visualize
-        self.XX                 = None
-        self.yy                 = None
-        self.model              = None
+        self.XX = None
+        self.yy = None
+        self.model = None
 
     def runModel(self, data):
         stock = self.stocks[len(self.stocks)-1]
@@ -68,9 +69,13 @@ class Backtest(Clair):
 
     def buyLogic(self, prob, data, testPeriod, *args, **kwargs):
         self.totalBuys += 1
+        if self.debug:
+            super().buyLogic(prob, data, testPeriod, *args, **kwargs)
 
     def sellLogic(self, prob, data, testPeriod, *args, **kwargs):
         self.totalSells += 1
+        if self.debug:
+            super().sellLogic(prob, data, testPeriod, *args, **kwargs)
 
     def nextPeriodLogic(self, prediction, performance, *args, **kwargs):
         self.periods += 1
@@ -82,6 +87,9 @@ class Backtest(Clair):
             self.decreases += 1
             if prediction == -1:
                 self.correctSells += 1
+
+        if self.debug:
+            super().nextPeriodLogic(prediction, performance, *args, **kwargs)
 
     def buyStats(self):
         try:
@@ -158,24 +166,24 @@ class Backtest(Clair):
             print("Error: Please run model before visualizing")
             return
 
-        X, y = self.XX, self.yy                                   # Retrieve previous XX and yy
-        X = StandardScaler().fit_transform(X)                     # Normalize X values
-        self.model.fit(X, y)                                      # Refit model
+        X, y = self.XX, self.yy
+        X = StandardScaler().fit_transform(X)
+        self.model.fit(X, y)
         x_min, x_max = X[:, 0].min() - 0.5, X[:, 0].max() + 0.5
         y_min, y_max = X[:, 1].min() - 0.5, X[:, 1].max() + 0.5
         xx, yy = meshgrid(arange(x_min, x_max, stepsize), arange(y_min, y_max, stepsize))
 
-        plt.figure(figsize=(width, height))                       # Figure size in inches
-        cm = plt.cm.RdBu                                          # Red/Blue gradients
-        RedBlue = ListedColormap(['#FF312E', '#6E8894'])          # Red = 0 (Negative) / Blue = 1 (Positve)
-        Axes = plt.subplot(1,1,1)                                 # Creating 1 plot
+        plt.figure(figsize=(width, height))
+        cm = plt.cm.RdBu
+        RedBlue = ListedColormap(['#FF312E', '#6E8894'])
+        Axes = plt.subplot(1,1,1)
         Z = self.model.decision_function(c_[xx.ravel(), yy.ravel()])
         Z = Z.reshape(xx.shape)
 
-        stock = self.stocks[len(self.stocks)-1]                   # Find most previous stock
-        Axes.set_title(stock)                                     # Set title
-        Axes.contourf(xx, yy, Z, cmap=cm, alpha=0.75)             # Contour shading
-        Axes.scatter(X[:, 0], X[:, 1], c=y, cmap=RedBlue)         # Plot data points
-        Axes.set_xlim(xx.min(), xx.max())                         # Limit x axis
-        Axes.set_ylim(yy.min(), yy.max())                         # Limit y axis
-        plt.savefig(stock+".png")                                 # Save figure
+        stock = self.stocks[len(self.stocks)-1]
+        Axes.set_title(stock)
+        Axes.contourf(xx, yy, Z, cmap=cm, alpha=0.75)
+        Axes.scatter(X[:, 0], X[:, 1], c=y, cmap=RedBlue)
+        Axes.set_xlim(xx.min(), xx.max())
+        Axes.set_ylim(yy.min(), yy.max())
+        plt.savefig(stock+'.svg', format='svg')
