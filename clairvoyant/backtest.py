@@ -15,7 +15,7 @@ class Backtest(Clair):
     def __init__(
             self, variables, trainStart, trainEnd, testStart, testEnd,
             buyThreshold=0.65, sellThreshold=0.65, C=1, gamma=10,
-            continuedTraining=False, tz=timezone('UTC'), debug=False
+            continuedTraining=False, tz=timezone('UTC')
             ):
 
         super().__init__(
@@ -34,7 +34,7 @@ class Backtest(Clair):
         self.increases = 0
         self.decreases = 0
         self.periods = 0
-        self.debug = debug
+        self.debug = False
 
         # Visualize
         self.XX = None
