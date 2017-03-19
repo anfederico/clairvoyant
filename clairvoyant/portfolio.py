@@ -12,7 +12,7 @@ class Portfolio(Clair):
     def __init__(
             self, variables, trainStart, trainEnd, testStart, testEnd,
             buyThreshold=0.65, sellThreshold=0.65, C=1, gamma=10,
-            continuedTraining=False, tz=timezone('UTC')
+            continuedTraining=False, tz=timezone('UTC'), transaction_cost=9.99
             ):
 
         super().__init__(
@@ -21,11 +21,15 @@ class Portfolio(Clair):
             gamma=gamma, continuedTraining=continuedTraining, tz=tz
             )
 
+        # Conditions
+        self.transaction_cost = transaction_cost
+
         # Run
         self.startingBalance = 0
         self.buyingPower = 0
         self.shares = 0
         self.lastQuote = 0
+        self.debug = False
 
         # All runs
         self.runs = 0
@@ -40,60 +44,63 @@ class Portfolio(Clair):
         self.buyingPower = startingBalance
         self.shares = 0
         self.lastQuote = 0
+        self.purchases = 0
+        self.sales = 0
 
         # Learn and execute
         model, X, y = self.learn(data)
         self.execute(data, model, X, y)
 
-        trainStart = DateIndex(data, self.trainStart, False)
-        trainEnd = DateIndex(data, self.trainEnd, True)
-        testStart = DateIndex(data, self.testStart, False)
-        testEnd = DateIndex(data, self.testEnd, True)
-
-        # Record Performance
-        self.lastQuote = FindConditions(data, testPeriod, "Close")
-        val = self.portfolioValue(data, testPeriod)
-        self.performances.append(
-            ((val-self.startingBalance)/self.startingBalance)*100
-            )
-
-    def portfolioValue(self, data, testPeriod):
-        quote = FindConditions(data, testPeriod, "Close")
+    def portfolioValue(self, data, period):
+        quote = FindConditions(data, period, "Close")
         return self.buyingPower+self.shares*quote
 
     def buyShares(self, shares, quote):
-        if (shares*quote) <= self.buyingPower:
-            self.buyingPower -= shares*quote
+        if (shares*quote) <= self.buyingPower - self.transaction_cost:
+            self.buyingPower -= shares*quote + self.transaction_cost
             self.shares += shares
+            self.purchases += 1
         else:
             print("Sorry, insufficient buying power.")
 
     def sellShares(self, shares, quote):
         if shares <= self.shares:
-            self.buyingPower += shares*quote
+            self.buyingPower += shares*quote - self.transaction_cost
             self.shares -= shares
+            self.sales += 1
         else:
             print("Sorry, you don't own this many shares.")
 
     def buyLogic(self, confidence, data, period):
         quote = data["Close"][period]
 
-        if confidence >= 0.75:
+        if confidence >= 0.9:
+            shareOrder = int((self.buyingPower*0.7)/quote)
+            self.buyShares(shareOrder, quote)
+        elif confidence >= 0.8:
+            shareOrder = int((self.buyingPower*0.5)/quote)
+            self.buyShares(shareOrder, quote)
+        elif confidence >= 0.75:
             shareOrder = int((self.buyingPower*0.3)/quote)
             self.buyShares(shareOrder, quote)
-        elif confidence >= 0.70:
-            shareOrder = int((self.buyingPower*0.2)/quote)
-            self.buyShares(shareOrder, quote)
-        elif confidence >= 0.65:
-            shareOrder = int((self.buyingPower*0.1)/quote)
-            self.buyShares(shareOrder, quote)
+
+        if self.debug:
+            super().buyLogic(confidence, data, period)
+            print(f'Bought {shareOrder} @ ${quote}')
 
     def sellLogic(self, confidence, data, period):
         quote = data["Close"][period]
-        if confidence >= 0.65:
+        if confidence >= 0.75 and self.shares > 0:
+            if self.debug:
+                super().sellLogic(confidence, data, period)
+                print(f'Sold {self.shares} @ ${quote}')
             self.sellShares(self.shares, quote)
 
     def nextPeriodLogic(self, prediction, nextPeriodPerformance, data, period):
+        if self.debug:
+            super().nextPeriodLogic(
+                prediction, nextPeriodPerformance, data, period
+                )
         quote = data["Close"][period]
 
         if prediction == 1 and nextPeriodPerformance > 0:
@@ -104,6 +111,13 @@ class Portfolio(Clair):
                 shareOrder = int((self.buyingPower*0.2)/quote)
                 self.buyShares(shareOrder, quote)
 
+        # Record Performance
+        self.lastQuote = FindConditions(data, period, "Close")
+        val = self.portfolioValue(data, period)
+        self.performances.append(
+            ((val-self.startingBalance)/self.startingBalance)*100
+            )
+
     def displayLastRun(self):
         bld, gre, red, end = '\033[1m', '\033[92m', '\033[91m', '\033[0m'
 
@@ -113,6 +127,8 @@ class Portfolio(Clair):
         print(bld+"Run #"+str(self.runs)+end)
         print("Buying Power: $" + str(round(self.buyingPower,2)))
         print("Shares: " + str(self.shares))
+        print(f'Buy Transactions: {self.purchases}')
+        print(f'Sell Transactions: {self.sales}')
 
         totalValue = round(self.buyingPower+self.shares*self.lastQuote,2)
         if totalValue > self.startingBalance:
@@ -129,7 +145,7 @@ class Portfolio(Clair):
         bld, gre, red, end = '\033[1m', '\033[92m', '\033[91m', '\033[0m'
 
         print(f'{bld}Performance across all runs{end}')
-        print(f'Runs: {self.runs})
+        print(f'Runs: {self.runs}')
 
         try:
             averagePerformance = round(

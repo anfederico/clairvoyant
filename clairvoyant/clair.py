@@ -10,11 +10,11 @@ from abc import ABCMeta, abstractmethod
 class Strategy(metaclass=ABCMeta):
     @abstractmethod
     def buyLogic(self, prob, data, period):
-        print(f'{data["Date"][period]}: buy with {prob} likelihood.')
+        print(f'[{data["Date"][period]}] buy with {prob} likelihood.')
 
     @abstractmethod
     def sellLogic(self, prob, data, period):
-        print(f'{data["Date"][period]}: sell with {prob} likelihood.')
+        print(f'[{data["Date"][period]}] sell with {prob} likelihood.')
 
     @abstractmethod
     def nextPeriodLogic(self, prediction, performance, data, period):
