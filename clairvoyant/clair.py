@@ -4,8 +4,27 @@ from numpy import vstack, hstack
 from pytz import timezone
 from pandas import to_datetime
 from clairvoyant.utils import DateIndex, FindConditions, PercentChange
+from abc import ABCMeta, abstractmethod
 
-class Clair:
+
+class Strategy(metaclass=ABCMeta):
+    @abstractmethod
+    def buyLogic(self, prob, data, period):
+        print(f'{data["Date"][period]}: buy with {prob} likelihood.')
+
+    @abstractmethod
+    def sellLogic(self, prob, data, period):
+        print(f'{data["Date"][period]}: sell with {prob} likelihood.')
+
+    @abstractmethod
+    def nextPeriodLogic(self, prediction, performance, data, period):
+        print(
+            f'[{data["Date"][period]}] prediction: {prediction}, ',
+            f'performance: {performance}'
+            )
+
+
+class Clair(Strategy):
     """
     Cla.I.R. - Classifier Inferred Recommendations
     Clair uses the support vector machine supplied by the sklearn library to
@@ -32,19 +51,20 @@ class Clair:
         trainStart = DateIndex(data, self.trainStart, False)
         trainEnd = DateIndex(data, self.trainEnd, True)
 
-        for i in range(trainStart, trainEnd+1):             # Training period
-
+        for i in range(trainStart, trainEnd+1):
             Xs = []
-            for var in self.variables:                      # Handles n variables
-                Xs.append(FindConditions(data, i, var))     # Find conditions for Period 1
+            for var in self.variables:
+                Xs.append(FindConditions(data, i, var))
             X.append(Xs)
 
-            y1 = PercentChange(data, i+1)                   # Find the stock price movement for Period 2
-            if y1 > 0: y.append(1)                          # If it went up, classify as 1
-            else:      y.append(0)                          # If it went down, classify as 0
+            y1 = PercentChange(data, i+1)
+            if y1 > 0:
+                y.append(1)
+            else:
+                y.append(0)
 
-        XX = vstack(X)                                      # Convert to numpy array
-        yy = hstack(y)                                      # Convert to numpy array
+        XX = vstack(X)
+        yy = hstack(y)
 
         model = SVC(C=self.C, gamma=self.gamma, probability=True)
         model.fit(XX, yy)
@@ -57,7 +77,7 @@ class Clair:
         positive = prediction[1]
         return negative, positive
 
-    def test(self, data, model, X=[], y=[]):
+    def execute(self, data, model, X=[], y=[]):
         testStart = DateIndex(data, self.testStart, False)
         testEnd = DateIndex(data, self.testEnd, True)
 
@@ -69,13 +89,15 @@ class Clair:
 
             neg, pos = self.predict(model, Xs)
 
-            if   pos >= self.buyThreshold:  prediction =  1      # If positive confidence >= buyThreshold, predict buy
-            elif neg >= self.sellThreshold: prediction = -1      # If negative confidence >= sellThreshold, predict sell
-            else: prediction = 0
+            if   pos >= self.buyThreshold:
+                prediction =  1
+            elif neg >= self.sellThreshold:
+                prediction = -1
+            else:
+                prediction = 0
 
             if prediction == 1:
                 self.buyLogic(pos, data, period)
-
             elif prediction == -1:
                 self.sellLogic(neg, data, period)
 
@@ -87,23 +109,20 @@ class Clair:
                 )
 
             if self.continuedTraining == True:
-
                 X.append(Xs)
-
                 if nextPeriodPerformance > 0:
                     y.append(1)
                 else:
                     y.append(0)
-
                 XX = vstack(X)
                 yy = hstack(y)
                 model.fit(XX, yy)
 
-    def buyLogic(self, prob, data, testPeriod):
-        print(f'{data["Date"][testPeriod]}: buy with {prob} probability')
+    def buyLogic(self, prob, data, period):
+        super().buyLogic(prob, data, period)
 
-    def sellLogic(self, prob, data, testPeriod):
-        print(f'{data["Date"][testPeriod]}: sell with {prob} probability')
+    def sellLogic(self, prob, data, period):
+        super().sellLogic(prob, data, period)
 
-    def nextPeriodLogic(self, prediction, performance, data, testPeriod):
-        pass
+    def nextPeriodLogic(self, prediction, performance, data, period):
+        super().nextPeriodLogic(prediction, performance, data, period)

@@ -4,20 +4,19 @@ import matplotlib.pyplot as plt
 
 from matplotlib.colors import ListedColormap
 from numpy import meshgrid, arange, c_
-from sklearn.svm import SVC
 from sklearn.preprocessing import StandardScaler
-from pandas import read_csv, to_datetime
 from numpy import vstack, hstack
-from csv import DictWriter
 from dateutil.parser import parse
 from pytz import timezone
 from clairvoyant.utils import DateIndex
 from clairvoyant import Clair
 
 class Backtest(Clair):
-    def __init__(self, variables, trainStart, trainEnd, testStart, testEnd,
-                 buyThreshold = 0.65, sellThreshold = 0.65, C = 1, gamma = 10,
-                 continuedTraining = False, tz=timezone('UTC')):
+    def __init__(
+            self, variables, trainStart, trainEnd, testStart, testEnd,
+            buyThreshold=0.65, sellThreshold=0.65, C=1, gamma=10,
+            continuedTraining=False, tz=timezone('UTC')
+            ):
 
         super().__init__(
             variables, trainStart, trainEnd, testStart, testEnd,
@@ -26,12 +25,15 @@ class Backtest(Clair):
             )
 
         # Stats
-        self.stocks             = []
-        self.dates              = []
-        self.totalBuys          = 0
-        self.correctBuys        = 0
-        self.totalSells         = 0
-        self.correctSells       = 0
+        self.stocks = []
+        self.dates = []
+        self.totalBuys = 0
+        self.correctBuys = 0
+        self.totalSells = 0
+        self.correctSells = 0
+        self.increases = 0
+        self.decreases = 0
+        self.periods = 0
 
         # Visualize
         self.XX                 = None
@@ -41,8 +43,9 @@ class Backtest(Clair):
     def runModel(self, data):
         stock = self.stocks[len(self.stocks)-1]
 
+        # Learn and execute
         model, X, y = self.learn(data)
-        self.test(data, model, X, y)
+        self.execute(data, model, X, y)
 
         trainStart = DateIndex(data, self.trainStart, False)
         trainEnd = DateIndex(data, self.trainEnd, True)
@@ -50,10 +53,12 @@ class Backtest(Clair):
         testEnd = DateIndex(data, self.testEnd, True)
 
         # Save for vizualization purposes
-        self.dates.append([data['Date'][trainStart].strftime('%m/%d/%Y'),
-                           data['Date'][trainEnd].strftime('%m/%d/%Y'),
-                           data['Date'][testStart].strftime('%m/%d/%Y'),
-                           data['Date'][testEnd].strftime('%m/%d/%Y')])
+        self.dates.append([
+            data['Date'][trainStart].strftime('%m/%d/%Y'),
+            data['Date'][trainEnd].strftime('%m/%d/%Y'),
+            data['Date'][testStart].strftime('%m/%d/%Y'),
+            data['Date'][testEnd].strftime('%m/%d/%Y')
+            ])
 
         XX = vstack(X)
         yy = hstack(y)
@@ -68,29 +73,27 @@ class Backtest(Clair):
         self.totalSells += 1
 
     def nextPeriodLogic(self, prediction, performance, *args, **kwargs):
-        # Case 1: Prediction is positive (buy), next Period performance is positive
-        if prediction == 1 and performance > 0:
-            self.correctBuys += 1
-
-        # Case 2: Prediction is positive (buy), next Period performance is negative
-        elif prediction == 1 and performance <= 0: pass
-
-        # Case 3: Prediction is negative (sell), next Period performance is negative
-        elif prediction == -1 and performance < 0:
-            self.correctSells += 1
-
-        # Case 4: Prediction is negative (sell), next Period performance is positive
-        elif prediction == -1 and performance >= 0: pass
-
-        # Case 5: No confident prediction
+        self.periods += 1
+        if performance > 0:
+            self.increases += 1
+            if prediction == 1:
+                self.correctBuys += 1
+        elif performance < 0:
+            self.decreases += 1
+            if prediction == -1:
+                self.correctSells += 1
 
     def buyStats(self):
-        try: return round((float(self.correctBuys)/self.totalBuys)*100,2)
-        except ZeroDivisionError: return float(0)
+        try:
+            return round((float(self.correctBuys)/self.totalBuys)*100,2)
+        except ZeroDivisionError:
+            return float(0)
 
     def sellStats(self):
-        try: return round((float(self.correctSells)/self.totalSells)*100,2)
-        except ZeroDivisionError: return float(0)
+        try:
+            return round((float(self.correctSells)/self.totalSells)*100,2)
+        except ZeroDivisionError:
+            return float(0)
 
     def displayConditions(self):
         bld, gre, red, end = '\033[1m', '\033[92m', '\033[91m', '\033[0m'
@@ -106,6 +109,9 @@ class Backtest(Clair):
         print("C: " + str(self.C))
         print("gamma: " + str(self.gamma))
         print("Continued Training: "+str(self.continuedTraining))
+        print("Total Testing Periods: "+str(self.periods))
+        print("Total Price Increases: "+str(self.increases))
+        print("Total Price Decreases: "+str(self.decreases))
 
     def displayStats(self):
         bld, gre, red, end = '\033[1m', '\033[92m', '\033[91m', '\033[0m'
@@ -125,7 +131,7 @@ class Backtest(Clair):
 
         print("\nTotal Buys: " + str(self.totalBuys))
         prnt = None
-        if   self.buyStats() > 50:
+        if self.buyStats() > 50:
             prnt = gre+str(self.buyStats())+"%"+end
         elif self.buyStats() < 50:
             prnt = red+str(self.buyStats())+"%"+end
@@ -135,7 +141,7 @@ class Backtest(Clair):
 
         print("Total Sells: "   + str(self.totalSells))
 
-        if   self.sellStats() > 50:
+        if self.sellStats() > 50:
             prnt = gre+str(self.sellStats())+"%"+end
         elif self.sellStats() < 50:
             prnt = red+str(self.sellStats())+"%"+end
