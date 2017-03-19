@@ -55,7 +55,7 @@ class Clair:
         prediction = model.predict_proba([Xs])[0]
         negative = prediction[0]
         positive = prediction[1]
-        return positive, negative
+        return negative, positive
 
     def test(self, data, model, X=[], y=[]):
         testStart = DateIndex(data, self.testStart, False)
@@ -67,23 +67,23 @@ class Clair:
             for var in self.variables:
                 Xs.append(FindConditions(data, period, var))
 
-            pos, neg = self.predict(model, Xs)
+            neg, pos = self.predict(model, Xs)
 
             if   pos >= self.buyThreshold:  prediction =  1      # If positive confidence >= buyThreshold, predict buy
             elif neg >= self.sellThreshold: prediction = -1      # If negative confidence >= sellThreshold, predict sell
             else: prediction = 0
 
             if prediction == 1:
-                self.buyLogic(self, pos, data, period)
+                self.buyLogic(pos, data, period)
 
             elif prediction == -1:
-                self.sellLogic(self, neg, data, period)
+                self.sellLogic(neg, data, period)
 
             period += 1
 
             nextPeriodPerformance = PercentChange(data, period)
             self.nextPeriodLogic(
-                self, prediction, nextPeriodPerformance, data, period
+                prediction, nextPeriodPerformance, data, period
                 )
 
             if self.continuedTraining == True:

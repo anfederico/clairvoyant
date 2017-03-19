@@ -62,11 +62,9 @@ class Backtest(Clair):
         self.model = model
 
     def buyLogic(self, prob, data, testPeriod, *args, **kwargs):
-        print(f'Buy with {prob} probability')
         self.totalBuys += 1
 
     def sellLogic(self, prob, data, testPeriod, *args, **kwargs):
-        print(f'Sell with {prob} probability')
         self.totalSells += 1
 
     def nextPeriodLogic(self, prediction, performance, *args, **kwargs):
