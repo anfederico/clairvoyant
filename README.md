@@ -201,7 +201,7 @@ backtest.visualizeModel()
 These functions will tell your portfolio simulation how to trade. We tried to balance simplicity and
 functionality to allow for intricate trading strategies.
 ```python
-class MyStrategy(Portfolio)
+class MyStrategy(Portfolio):
     def buyLogic(self, confidence, row, colmap):
         quote = getattr(row, colmap['Close'])                    # Leave as is
 
