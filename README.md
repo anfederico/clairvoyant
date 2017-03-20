@@ -272,7 +272,7 @@ Download historical data directly from popular distribution sources. Clairvoyant
 flexible with most date formats and will ignore unused columns in the dataset. If it
 can't find the date specified, it will choose a suitable alternative.
 ```text
-Date,Open,High,Low,Close,Volume,sentiment,influence
+Date,Open,High,Low,Close,Volume,influence,sentiment
 03/01/2013,27.72,27.98,27.52,27.95,34851872,65.7894736842,-0.121
 03/04/2013,27.85,28.15,27.7,28.15,38167504,75.9450171821,0.832
 03/05/2013,28.29,28.54,28.16,28.35,41437136,84.9230769231,0.151
