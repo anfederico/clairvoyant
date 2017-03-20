@@ -1,5 +1,6 @@
 from pytz import timezone
 import pandas as pd
+from copy import deepcopy
 
 
 class History:
@@ -63,9 +64,26 @@ class History:
                 raise KeyError(f'\'{v}\' is not a valid column.')
         self._features = vals
 
+    def __deepcopy__(self, memo):
+        cls = self.__class__
+        result = cls.__new__(cls)
+        memo[id(self)] = result
+        for k, v in self.__dict__.items():
+            setattr(result, k, deepcopy(v, memo))
+        return result
+
     def __getitem__(self, key):
-        if isinstance(key, int):
+        if isinstance(key, slice):
+            dc = deepcopy(self)
+            dc._df['dt'] = pd.to_datetime(dc._df['Date'])
+            dc._df['dt'].apply(dc._timezone.localize)
+            mask = (dc._df['dt']>=key.start) & (dc._df['dt']<=key.stop)
+            dc._df = dc._df[mask]
+            dc._df = dc._df.drop('dt', 1)
+            return dc
+        elif isinstance(key, int):
             return self._df.iloc[key]
+
         try:
             return self._df[self._col_map[key]]
         except KeyError:

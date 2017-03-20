@@ -1,6 +1,7 @@
 import unittest
 import pandas as pd
 import os
+import pytz
 from clairvoyant import History
 dir_path = os.path.dirname(os.path.realpath(__file__))
 
@@ -34,6 +35,16 @@ class Test_History(unittest.TestCase):
             count += 1
         print(count)
         self.assertEqual(count, 232)
+
+    def test_slicing_with_dates(self):
+        data = self.sample
+        data.rename(columns={'Unnamed: 0': 'Date'})
+        utc = pytz.timezone('UTC')
+        start = utc.localize(pd.to_datetime('2017-02-24 06:30:00'))
+        end = utc.localize(pd.to_datetime('2017-02-24 13:00:00'))
+        cpy = data[start:end]
+        self.assertEqual(cpy[0]['Date'], '2017-02-24 06:30:00')
+        self.assertEqual(cpy[-1]['Date'], '2017-02-24 13:00:00')
 
     def test_len(self):
         data = self.sample
