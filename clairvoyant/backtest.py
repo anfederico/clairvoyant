@@ -8,7 +8,6 @@ from sklearn.preprocessing import StandardScaler
 from numpy import vstack, hstack
 from dateutil.parser import parse
 from pytz import timezone
-from clairvoyant.utils import DateIndex
 from clairvoyant import Clair
 
 class Backtest(Clair):
@@ -34,6 +33,7 @@ class Backtest(Clair):
         self.increases = 0
         self.decreases = 0
         self.periods = 0
+
         self.debug = False
 
         # Visualize
@@ -48,34 +48,29 @@ class Backtest(Clair):
         model, X, y = self.learn(data)
         self.execute(data, model, X, y)
 
-        trainStart = DateIndex(data, self.trainStart, False)
-        trainEnd = DateIndex(data, self.trainEnd, True)
-        testStart = DateIndex(data, self.testStart, False)
-        testEnd = DateIndex(data, self.testEnd, True)
-
         # Save for vizualization purposes
         self.dates.append([
-            data['Date'][trainStart].strftime('%m/%d/%Y'),
-            data['Date'][trainEnd].strftime('%m/%d/%Y'),
-            data['Date'][testStart].strftime('%m/%d/%Y'),
-            data['Date'][testEnd].strftime('%m/%d/%Y')
+            self.trainStart.strftime('%m/%d/%Y'),
+            self.trainEnd.strftime('%m/%d/%Y'),
+            self.testStart.strftime('%m/%d/%Y'),
+            self.testEnd.strftime('%m/%d/%Y')
             ])
 
         XX = vstack(X)
         yy = hstack(y)
-        self.XX    = XX
-        self.yy    = yy
+        self.XX = XX
+        self.yy = yy
         self.model = model
 
-    def buyLogic(self, prob, data, testPeriod, *args, **kwargs):
+    def buyLogic(self, prob, *args, **kwargs):
         self.totalBuys += 1
         if self.debug:
-            super().buyLogic(prob, data, testPeriod, *args, **kwargs)
+            super().buyLogic(prob, *args, **kwargs)
 
-    def sellLogic(self, prob, data, testPeriod, *args, **kwargs):
+    def sellLogic(self, prob, *args, **kwargs):
         self.totalSells += 1
         if self.debug:
-            super().sellLogic(prob, data, testPeriod, *args, **kwargs)
+            super().sellLogic(prob, *args, **kwargs)
 
     def nextPeriodLogic(self, prediction, performance, *args, **kwargs):
         self.periods += 1
@@ -90,6 +85,16 @@ class Backtest(Clair):
 
         if self.debug:
             super().nextPeriodLogic(prediction, performance, *args, **kwargs)
+
+    def clearStats(self):
+        self.dates = []
+        self.totalBuys = 0
+        self.correctBuys = 0
+        self.totalSells = 0
+        self.correctSells = 0
+        self.increases = 0
+        self.decreases = 0
+        self.periods = 0
 
     def buyStats(self):
         try:
