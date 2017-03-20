@@ -86,7 +86,10 @@ class History:
         if isinstance(key, slice):
             dc = deepcopy(self)
             dc._df['dt'] = pd.to_datetime(dc._df[dc._col_map['Date']])
-            dc._df['dt'].apply(dc._timezone.localize)
+            try:
+                dc._df['dt'].apply(dc._timezone.localize)
+            except ValueError:
+                pass
             mask = (dc._df['dt']>=key.start) & (dc._df['dt']<=key.stop)
             dc._df = dc._df[mask]
             dc._df = dc._df.drop('dt', 1)

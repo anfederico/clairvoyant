@@ -33,6 +33,7 @@ class Backtest(Clair):
         self.increases = 0
         self.decreases = 0
         self.periods = 0
+
         self.debug = False
 
         # Visualize
@@ -64,7 +65,7 @@ class Backtest(Clair):
     def buyLogic(self, prob, *args, **kwargs):
         self.totalBuys += 1
         if self.debug:
-            super().buyLogic(prob, data, testPeriod, *args, **kwargs)
+            super().buyLogic(prob, *args, **kwargs)
 
     def sellLogic(self, prob, *args, **kwargs):
         self.totalSells += 1
@@ -84,6 +85,16 @@ class Backtest(Clair):
 
         if self.debug:
             super().nextPeriodLogic(prediction, performance, *args, **kwargs)
+
+    def clearStats(self):
+        self.dates = []
+        self.totalBuys = 0
+        self.correctBuys = 0
+        self.totalSells = 0
+        self.correctSells = 0
+        self.increases = 0
+        self.decreases = 0
+        self.periods = 0
 
     def buyStats(self):
         try:
