@@ -61,15 +61,15 @@ class Backtest(Clair):
         self.yy = yy
         self.model = model
 
-    def buyLogic(self, prob, data, testPeriod, *args, **kwargs):
+    def buyLogic(self, prob, *args, **kwargs):
         self.totalBuys += 1
         if self.debug:
             super().buyLogic(prob, data, testPeriod, *args, **kwargs)
 
-    def sellLogic(self, prob, data, testPeriod, *args, **kwargs):
+    def sellLogic(self, prob, *args, **kwargs):
         self.totalSells += 1
         if self.debug:
-            super().sellLogic(prob, data, testPeriod, *args, **kwargs)
+            super().sellLogic(prob, *args, **kwargs)
 
     def nextPeriodLogic(self, prediction, performance, *args, **kwargs):
         self.periods += 1
