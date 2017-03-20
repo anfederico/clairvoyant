@@ -8,7 +8,6 @@ from sklearn.preprocessing import StandardScaler
 from numpy import vstack, hstack
 from dateutil.parser import parse
 from pytz import timezone
-from clairvoyant.utils import DateIndex
 from clairvoyant import Clair
 
 class Backtest(Clair):
@@ -48,23 +47,18 @@ class Backtest(Clair):
         model, X, y = self.learn(data)
         self.execute(data, model, X, y)
 
-        trainStart = DateIndex(data, self.trainStart, False)
-        trainEnd = DateIndex(data, self.trainEnd, True)
-        testStart = DateIndex(data, self.testStart, False)
-        testEnd = DateIndex(data, self.testEnd, True)
-
         # Save for vizualization purposes
         self.dates.append([
-            data['Date'][trainStart].strftime('%m/%d/%Y'),
-            data['Date'][trainEnd].strftime('%m/%d/%Y'),
-            data['Date'][testStart].strftime('%m/%d/%Y'),
-            data['Date'][testEnd].strftime('%m/%d/%Y')
+            self.trainStart.strftime('%m/%d/%Y'),
+            self.trainEnd.strftime('%m/%d/%Y'),
+            self.testStart.strftime('%m/%d/%Y'),
+            self.testEnd.strftime('%m/%d/%Y')
             ])
 
         XX = vstack(X)
         yy = hstack(y)
-        self.XX    = XX
-        self.yy    = yy
+        self.XX = XX
+        self.yy = yy
         self.model = model
 
     def buyLogic(self, prob, data, testPeriod, *args, **kwargs):

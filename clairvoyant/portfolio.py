@@ -4,7 +4,6 @@ from numpy import vstack, hstack
 from csv import DictWriter
 from dateutil.parser import parse
 from pytz import timezone
-from clairvoyant.utils import DateIndex, FindConditions
 from clairvoyant import Clair
 
 
@@ -51,8 +50,8 @@ class Portfolio(Clair):
         model, X, y = self.learn(data)
         self.execute(data, model, X, y)
 
-    def portfolioValue(self, data, period):
-        quote = FindConditions(data, period, "Close")
+    def portfolioValue(self, row):
+        quote = row.close
         return self.buyingPower+self.shares*quote
 
     def buyShares(self, shares, quote):
@@ -71,8 +70,8 @@ class Portfolio(Clair):
         else:
             print("Sorry, you don't own this many shares.")
 
-    def buyLogic(self, confidence, data, period):
-        quote = data["Close"][period]
+    def buyLogic(self, confidence, row):
+        quote = row.close
 
         if confidence >= 0.9:
             shareOrder = int((self.buyingPower*0.7)/quote)
@@ -85,23 +84,21 @@ class Portfolio(Clair):
             self.buyShares(shareOrder, quote)
 
         if self.debug:
-            super().buyLogic(confidence, data, period)
+            super().buyLogic(confidence, row)
             print(f'Bought {shareOrder} @ ${quote}')
 
-    def sellLogic(self, confidence, data, period):
-        quote = data["Close"][period]
+    def sellLogic(self, confidence, row):
+        quote = row.close
         if confidence >= 0.75 and self.shares > 0:
             if self.debug:
-                super().sellLogic(confidence, data, period)
+                super().sellLogic(confidence, row)
                 print(f'Sold {self.shares} @ ${quote}')
             self.sellShares(self.shares, quote)
 
-    def nextPeriodLogic(self, prediction, nextPeriodPerformance, data, period):
+    def nextPeriodLogic(self, prediction, nextPeriodPerformance, row):
         if self.debug:
-            super().nextPeriodLogic(
-                prediction, nextPeriodPerformance, data, period
-                )
-        quote = data["Close"][period]
+            super().nextPeriodLogic(prediction, nextPeriodPerformance, row)
+        quote = row.close
 
         if prediction == 1 and nextPeriodPerformance > 0:
             if nextPeriodPerformance >= 0.025:
@@ -112,8 +109,8 @@ class Portfolio(Clair):
                 self.buyShares(shareOrder, quote)
 
         # Record Performance
-        self.lastQuote = FindConditions(data, period, "Close")
-        val = self.portfolioValue(data, period)
+        self.lastQuote = row.close
+        val = self.portfolioValue(row)
         self.performances.append(
             ((val-self.startingBalance)/self.startingBalance)*100
             )

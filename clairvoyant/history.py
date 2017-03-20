@@ -17,17 +17,23 @@ class History:
         else:
             self._col_map = col_map
 
-        if features is None:
-            self._features = ['Sentiment', 'Influence']
-        else:
-            self._features = features
-
         if isinstance(data, str):
             self._df = self.read_csv(data)
         else:
             self._df = data
 
+        # make sure all column names can be converted in itertuple
+        newnames = {v:k.lower() for k,v in self._col_map.items()}
+        self.rename(columns=newnames)
+
+        if features is None:
+            self.features = ['Sentiment', 'Influence']
+        else:
+            self.features = features
+
         self._timezone = tz
+        self._df['Return'] = (self.close - self.open)/self.open
+        self._col_map['Return'] = 'Return'
 
     @property
     def date(self):
@@ -54,6 +60,10 @@ class History:
         return self['Volume']
 
     @property
+    def return_rate(self):
+        return self['Return']
+
+    @property
     def features(self):
         return self._features
 
@@ -75,7 +85,7 @@ class History:
     def __getitem__(self, key):
         if isinstance(key, slice):
             dc = deepcopy(self)
-            dc._df['dt'] = pd.to_datetime(dc._df['Date'])
+            dc._df['dt'] = pd.to_datetime(dc._df[dc._col_map['Date']])
             dc._df['dt'].apply(dc._timezone.localize)
             mask = (dc._df['dt']>=key.start) & (dc._df['dt']<=key.stop)
             dc._df = dc._df[mask]
@@ -88,6 +98,7 @@ class History:
             return self._df[self._col_map[key]]
         except KeyError:
             try:
+                pd.to_datetime(key)  # test conversion to datetime
                 datekey = self._col_map['Date']
                 return self._df.loc[self._df[datekey]==key]
             except ValueError:
@@ -96,7 +107,7 @@ class History:
             raise
 
     def __iter__(self):
-        return self._df.iterrows()
+        return self._df.itertuples()
 
     def __len__(self):
         return len(self._df)
