@@ -40,8 +40,7 @@ movement the following day. By putting your trading algorithm aside and testing 
 alone, you can rapidly build and test more reliable models.
 
 ```python
-from clairvoyant import Backtest
-from pandas import read_csv
+from clairvoyant import Backtest, History
 
 # Testing performance on a single stock
 
@@ -58,10 +57,11 @@ continuedTraining = False       # Continue training during testing period? (defa
 
 backtest = Backtest(variables, trainStart, trainEnd, testStart, testEnd)
 
-data = read_csv("Stocks/SBUX.csv")      # Read in data
-data = data.round(3)                    # Round all values                  
-backtest.stocks.append("SBUX")          # Inform the model which stock is being tested
-for i in range(0,10):                   # Run the model 10-15 times  
+cols = {'Date': 'date', 'Open': 'open', 'Close': 'close',
+        'SSO': 'sentiment', 'SSC': 'influence'}       # Define a column map
+data = History("Stocks/SBUX.csv", col_map=cols)       # Read in data       
+backtest.stocks.append("SBUX")                        # Inform the model which stock is being tested
+for i in range(0,10):                                 # Run the model 10-15 times  
     backtest.runModel(data)
 
 # Testing performance across multiple stocks
@@ -72,8 +72,7 @@ stocks = ["AAPL", "ADBE", "AMGN", "AMZN",
           "SBUX", "TSLA", "VRTX", "YHOO"]
 
 for stock in stocks:
-    data = read_csv('Stocks/%s.csv' % stock)
-    data = data.round(3)
+    data = History(f'Stocks/{stock}.csv', col_map=cols)
     backtest.stocks.append(stock)
     for i in range(0,10):
         backtest.runModel(data)
@@ -83,6 +82,7 @@ backtest.displayStats()
 ```
 
 #### View Results
+
 <pre>
 <b>Conditions</b>
 X1: SSO
@@ -125,8 +125,7 @@ lets you control the flow of your capital based on the model's confidence in its
 and the following next day outcome.
 
 ```python
-from clairvoyant import Portfolio
-from pandas import read_csv
+from clairvoyant import Portfolio, History
 
 variables  = ["SSO", "SSC", "SSL"]   # Financial indicators of choice
 trainStart = '2013-03-01'            # Start of training period
@@ -141,16 +140,19 @@ continuedTraining = False            # Continue training during testing period? 
 startingBalance = 1000000            # Starting balance of portfolio
 
 # User defined trading logic (see below)
-def buyLogic(self, confidence, data, testDay)
-def sellLogic(self, confidence, data, testDay)
-def nextDayLogic(self, prediction, nextDayPerformance, data, testDay)
+class MyStrategy(Portfolio):
+    def buyLogic(self, confidence, row, colmap):
+      ...
+    def sellLogic(self, confidence, row, colmap):
+      ...
+    def nextPeriodLogic(self, prediction, nextDayPerformance, row, colmap):
+      ...
 
-portfolio = Portfolio(variables, trainStart, trainEnd, testStart, testEnd)
+portfolio = MyStrategy(variables, trainStart, trainEnd, testStart, testEnd)
 
-data = read_csv("Stocks/YHOO.csv")
-data = data.round(3)
+data = History("Stocks/YHOO.csv", col_map=cols)
 for i in range(0,5):
-    portfolio.runModel(data, startingBalance, buyLogic, sellLogic, nextDayLogic)
+    portfolio.runModel(data, startingBalance)
     portfolio.displayLastRun()
 
 portfolio.displayAllRuns()
@@ -193,66 +195,67 @@ This feature will give you an immediate sense of how predictable your data is.
 ```python
 backtest.visualizeModel()
 ```
-<img src="https://github.com/uclatommy/Clairvoyant/blob/master/media/SBUX.png" width=50%>
+<img src="https://github.com/uclatommy/Clairvoyant/blob/master/media/TSLA.svg" width=50%>
 
 #### User Defined Trading Logic
 These functions will tell your portfolio simulation how to trade. We tried to balance simplicity and
 functionality to allow for intricate trading strategies.
 ```python
-def buyLogic(self, confidence, data, testDay):
-    quote = data["Close"][testDay]                           # Leave as is
+class MyStrategy(Portfolio)
+    def buyLogic(self, confidence, row, colmap):
+        quote = getattr(row, colmap['Close'])                    # Leave as is
 
-    if confidence >= 0.75:                                   # If model signals buy
-        shareOrder = int((self.buyingPower*0.3)/quote)       # and is 75-100% confident
-        self.buyShares(shareOrder, quote)                    # invest 30% of buying power    
+        if confidence >= 0.75:                                   # If model signals buy
+            shareOrder = int((self.buyingPower*0.3)/quote)       # and is 75-100% confident
+            self.buyShares(shareOrder, quote)                    # invest 30% of buying power    
 
-    elif confidence >= 0.70:                                 # If model is 70-75% confident
-        shareOrder = int((self.buyingPower*0.2)/quote)       # invest 20% of buying power
-        self.buyShares(shareOrder, quote)
+        elif confidence >= 0.70:                                 # If model is 70-75% confident
+            shareOrder = int((self.buyingPower*0.2)/quote)       # invest 20% of buying power
+            self.buyShares(shareOrder, quote)
 
-    elif confidence >= 0.65:                                 # If model is 65-70% confident
-        shareOrder = int((self.buyingPower*0.1)/quote)       # invest 10% of buying power
-        self.buyShares(shareOrder, quote)
+        elif confidence >= 0.65:                                 # If model is 65-70% confident
+            shareOrder = int((self.buyingPower*0.1)/quote)       # invest 10% of buying power
+            self.buyShares(shareOrder, quote)
 
 
-def sellLogic(self, confidence, data, testDay):
-    quote = data["Close"][testDay]                       
+    def sellLogic(self, confidence, row, colmap):
+        quote = getattr(row, colmap['Close'])                       
 
-    if confidence >= 0.65:                                   # If model signals sell
-        self.sellShares(self.shares, quote)                  # and is 65-100% confident
-                                                             # sell all shares    
+        if confidence >= 0.65:                                   # If model signals sell
+            self.sellShares(self.shares, quote)                  # and is 65-100% confident
+                                                                 # sell all shares    
 
-def nextDayLogic(self, prediction, nextDayPerformance, data, testDay):
-    quote = data["Close"][testDay]                        
+    def nextDayLogic(self, prediction, nextPeriodPerformance, row, colmap):
+        quote = getattr(row, colmap['Close'])                        
 
-    # Case 1: Prediction is buy, price increases
-    if prediction == 1 and nextDayPerformance > 0:
+        # Case 1: Prediction is buy, price increases
+        if prediction == 1 and nextPeriodPerformance > 0:
 
-        if nextDayPerformance >= 0.025:                      # If I bought shares
-            self.sellShares(self.shares, quote)              # and price increases >= 2.5%
-                                                             # sell all shares
+            if nextPeriodPerformance >= 0.025:                   # If I bought shares
+                self.sellShares(self.shares, quote)              # and price increases >= 2.5%
+                                                                 # sell all shares
 
-    # Case 2: Prediction is buy, price decreases
-    elif prediction == 1 and nextDayPerformance <= 0: pass
+        # Case 2: Prediction is buy, price decreases
+        elif prediction == 1 and nextPeriodPerformance <= 0: pass
 
-                                                             # If I bought shares
-                                                             # and price decreases
-                                                             # hold position
+                                                                 # If I bought shares
+                                                                 # and price decreases
+                                                                 # hold position
 
-    # Case 3: Prediction is sell, price decreases
-    elif prediction == -1 and nextDayPerformance <= 0:
+        # Case 3: Prediction is sell, price decreases
+        elif prediction == -1 and nextPeriodPerformance <= 0:
 
-        if nextDayPerformance <= -0.025:                     # If I sold shares
-            shareOrder = int((self.buyingPower*0.2)/quote)   # and price decreases >= 2.5%
-            self.buyShares(shareOrder, quote)                # reinvest 20% of buying power
+            if nextPeriodPerformance <= -0.025:                  # If I sold shares
+                shareOrder = int((self.buyingPower*0.2)/quote)   # and price decreases >= 2.5%
+                self.buyShares(shareOrder, quote)                # reinvest 20% of buying power
 
-    # Case 4: Prediction is sell, price increases
-    elif prediction == -1 and nextDayPerformance > 0: pass
+        # Case 4: Prediction is sell, price increases
+        elif prediction == -1 and nextPeriodPerformance > 0: pass
 
-                                                             # If I sold shares
-                                                             # and price increases
-                                                             # hold position
-    # Case 5: No confident prediction was made
+                                                                 # If I sold shares
+                                                                 # and price increases
+                                                                 # hold position
+        # Case 5: No confident prediction was made
 ```
 
 #### Multivariate Functionality
@@ -269,7 +272,7 @@ Download historical data directly from popular distribution sources. Clairvoyant
 flexible with most date formats and will ignore unused columns in the dataset. If it
 can't find the date specified, it will choose a suitable alternative.
 ```text
-Date,Open,High,Low,Close,Volume,SSO,SCC
+Date,Open,High,Low,Close,Volume,sentiment,influence
 03/01/2013,27.72,27.98,27.52,27.95,34851872,65.7894736842,-0.121
 03/04/2013,27.85,28.15,27.7,28.15,38167504,75.9450171821,0.832
 03/05/2013,28.29,28.54,28.16,28.35,41437136,84.9230769231,0.151
