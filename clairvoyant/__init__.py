@@ -1,2 +1,5 @@
-from Backtest import Backtest
-from Portfolio import Portfolio
+from .history import History
+from .clair import Clair
+from .backtest import Backtest
+from .portfolio import Portfolio
+__all__ = ['Backtest', 'Clair', 'Portfolio', 'History']
