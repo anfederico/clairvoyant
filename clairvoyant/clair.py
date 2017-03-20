@@ -9,19 +9,25 @@ from clairvoyant import History
 
 class Strategy(metaclass=ABCMeta):
     @abstractmethod
-    def buyLogic(self, prob, row):
-        print(f'[{row.date}] buy with {prob} likelihood.')
+    def buyLogic(self, prob, row, attrs):
+        assert(isinstance(row, tuple))
+        assert(isinstance(attrs, dict))
+        dt = getattr(row, attrs['Date'])
+        print(f'[{dt}] buy with {prob} likelihood.')
 
     @abstractmethod
-    def sellLogic(self, prob, row):
-        print(f'[{row.date}] sell with {prob} likelihood.')
+    def sellLogic(self, prob, row, attrs):
+        assert(isinstance(row, tuple))
+        assert(isinstance(attrs, dict))
+        dt = getattr(row, attrs['Date'])
+        print(f'[{dt}] sell with {prob} likelihood.')
 
     @abstractmethod
-    def nextPeriodLogic(self, prediction, performance, row):
-        print(
-            f'[{row.date}] prediction: {prediction}, ',
-            f'performance: {performance}'
-            )
+    def nextPeriodLogic(self, prediction, performance, row, attrs):
+        assert(isinstance(row, tuple))
+        assert(isinstance(attrs, dict))
+        dt = getattr(row, attrs['Date'])
+        print(f'[{dt}] prediction: {prediction}, performance: {performance}')
 
 
 class Clair(Strategy):
@@ -95,15 +101,15 @@ class Clair(Strategy):
                 prediction = 0
 
             if prediction == 1:
-                self.buyLogic(pos, row)
+                self.buyLogic(pos, row, data._col_map)
             elif prediction == -1:
-                self.sellLogic(neg, row)
+                self.sellLogic(neg, row, data._col_map)
 
             if row.Index < len(data)-1:
                 period = row.Index + 1
                 nextPeriodPerformance = data.return_rate[period]
                 self.nextPeriodLogic(
-                    prediction, nextPeriodPerformance, row
+                    prediction, nextPeriodPerformance, row, data._col_map
                     )
 
             if self.continuedTraining == True:
@@ -116,11 +122,11 @@ class Clair(Strategy):
                 yy = hstack(y)
                 model.fit(XX, yy)
 
-    def buyLogic(self, prob, row):
-        super().buyLogic(prob, row)
+    def buyLogic(self, prob, row, attrs):
+        super().buyLogic(prob, row, attrs)
 
-    def sellLogic(self, prob, row):
-        super().sellLogic(prob, row)
+    def sellLogic(self, prob, row, attrs):
+        super().sellLogic(prob, row, attrs)
 
-    def nextPeriodLogic(self, prediction, performance, row):
-        super().nextPeriodLogic(prediction, performance, row)
+    def nextPeriodLogic(self, prediction, performance, row, attrs):
+        super().nextPeriodLogic(prediction, performance, row, attrs)

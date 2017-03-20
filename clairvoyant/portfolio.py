@@ -50,8 +50,8 @@ class Portfolio(Clair):
         model, X, y = self.learn(data)
         self.execute(data, model, X, y)
 
-    def portfolioValue(self, row):
-        quote = row.close
+    def portfolioValue(self, row, attrs):
+        quote = getattr(row, attrs['Close'])
         return self.buyingPower+self.shares*quote
 
     def buyShares(self, shares, quote):
@@ -70,8 +70,8 @@ class Portfolio(Clair):
         else:
             print("Sorry, you don't own this many shares.")
 
-    def buyLogic(self, confidence, row):
-        quote = row.close
+    def buyLogic(self, confidence, row, attrs):
+        quote = getattr(row, attrs['Close'])
 
         if confidence >= 0.9:
             shareOrder = int((self.buyingPower*0.7)/quote)
@@ -84,21 +84,23 @@ class Portfolio(Clair):
             self.buyShares(shareOrder, quote)
 
         if self.debug:
-            super().buyLogic(confidence, row)
+            super().buyLogic(confidence, row, attrs)
             print(f'Bought {shareOrder} @ ${quote}')
 
-    def sellLogic(self, confidence, row):
-        quote = row.close
+    def sellLogic(self, confidence, row, attrs):
+        quote = getattr(row, attrs['Close'])
         if confidence >= 0.75 and self.shares > 0:
             if self.debug:
-                super().sellLogic(confidence, row)
+                super().sellLogic(confidence, row, attrs)
                 print(f'Sold {self.shares} @ ${quote}')
             self.sellShares(self.shares, quote)
 
-    def nextPeriodLogic(self, prediction, nextPeriodPerformance, row):
+    def nextPeriodLogic(self, prediction, nextPeriodPerformance, row, attrs):
         if self.debug:
-            super().nextPeriodLogic(prediction, nextPeriodPerformance, row)
-        quote = row.close
+            super().nextPeriodLogic(
+                prediction, nextPeriodPerformance, row, attrs
+                )
+        quote = getattr(row, attrs['Close'])
 
         if prediction == 1 and nextPeriodPerformance > 0:
             if nextPeriodPerformance >= 0.025:
@@ -109,8 +111,8 @@ class Portfolio(Clair):
                 self.buyShares(shareOrder, quote)
 
         # Record Performance
-        self.lastQuote = row.close
-        val = self.portfolioValue(row)
+        self.lastQuote = getattr(row, attrs['Close'])
+        val = self.portfolioValue(row, attrs)
         self.performances.append(
             ((val-self.startingBalance)/self.startingBalance)*100
             )

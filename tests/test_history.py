@@ -46,12 +46,25 @@ class Test_History(unittest.TestCase):
 
     def test_slicing_with_dates(self):
         data = self.sample
-        utc = pytz.timezone('UTC')
-        start = utc.localize(pd.to_datetime('2017-02-24 06:30:00'))
-        end = utc.localize(pd.to_datetime('2017-02-24 13:00:00'))
+        tz = data._timezone
+        start = tz.localize(pd.to_datetime('2017-02-24 06:30:00'))
+        end = tz.localize(pd.to_datetime('2017-02-24 07:00:00'))
+        # slicing produces a new History object
         cpy = data[start:end]
         self.assertEqual(cpy.date.iloc[0], '2017-02-24 06:30:00')
-        self.assertEqual(cpy.date.iloc[-1], '2017-02-24 13:00:00')
+        self.assertEqual(cpy.date.iloc[-1], '2017-02-24 07:00:00')
+        # renaming will change the namedtuple attributes
+        data.rename(columns={'date': 'mydate'})
+        for row in data[start:end]:
+            self.assertTrue(hasattr(row, 'mydate'))
+            self.assertFalse(hasattr(row, 'date'))
+
+    def test_slicing_with_integers(self):
+        data = self.sample
+        # can also slice by integer index
+        for row in data[0:3]:
+            self.assertTrue(isinstance(row, tuple))
+            self.assertTrue(hasattr(row, 'date'))
 
     def test_len(self):
         data = self.sample

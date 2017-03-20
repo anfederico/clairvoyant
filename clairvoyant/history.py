@@ -85,6 +85,9 @@ class History:
     def __getitem__(self, key):
         if isinstance(key, slice):
             dc = deepcopy(self)
+            if isinstance(key.start, int):
+                dc._df = dc._df[key]
+                return dc
             dc._df['dt'] = pd.to_datetime(dc._df[dc._col_map['Date']])
             try:
                 dc._df['dt'].apply(dc._timezone.localize)
