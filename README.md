@@ -195,7 +195,7 @@ This feature will give you an immediate sense of how predictable your data is.
 ```python
 backtest.visualizeModel()
 ```
-<img src="https://github.com/uclatommy/Clairvoyant/blob/master/media/TSLA.svg" width=50%>
+<img src="https://cdn.rawgit.com/uclatommy/Clairvoyant/f771124f/media/TSLA.svg" width=50%>
 
 #### User Defined Trading Logic
 These functions will tell your portfolio simulation how to trade. We tried to balance simplicity and
