@@ -5,7 +5,46 @@ from copy import deepcopy
 
 class History:
     """
-    Data wrapper.
+    Manages model data and exposes a standardized interface regardless of how
+    you name your data columns.
+
+    Convenience features
+    You can query for a row by date::
+
+        history['2017-02-14 06:30:00']  # get data by a specific date
+
+    You can slice using datetime objects or index numbers::
+
+        history[startDate:endDate]  # get data between startDate and endDate
+        history[0:100]              # get rows between 0 and 100
+
+    You can get individual records by index::
+
+        history[10]  # gets a row of data
+
+    You can access a column of data by key just like a dataframe::
+
+        history['Open']  # gets a column of data
+
+    :param data: Can be a string representing a csv file or it can be a pandas
+                 dataframe.
+    :param col_map: This parameter is a dict representing a mapping between your
+                    column names to the standardized names. Keys are the
+                    standardized names and the values are the actual column
+                    names found in your data.
+    :param tz: The timezone associated with the datetimes in your data.
+    :param features: The column names to use for training and running your
+                     model.
+
+    :ivar date: Datetime series in data corresponding to the beginning of each
+                period.
+    :ivar open: Opening stock price series.
+    :ivar high: Series of stock price highs.
+    :ivar low: Series of stock price lows.
+    :ivar close: Closing stock price series.
+    :ivar volume: Series of stock price trading volume.
+    :ivar return_rate: Series of percentage change calculated as a percent of
+                       opening price.
     """
     def __init__(self, data, col_map=None, tz=timezone('UTC'), features=None):
         if col_map is None:

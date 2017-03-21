@@ -8,6 +8,12 @@ from clairvoyant import History
 
 
 class Strategy(metaclass=ABCMeta):
+    """
+    Defines a required interface for any classes which execute on a trained
+    model. These functions determine how the class behaves in response to buy
+    and sell triggers. These functions are intended to be overridden by child
+    classes to implement client-specified logic.
+    """
     @abstractmethod
     def buyLogic(self, prob, row, attrs):
         assert(isinstance(row, tuple))
@@ -36,6 +42,22 @@ class Clair(Strategy):
     Clair uses the support vector machine supplied by the sklearn library to
     to infer buy and sell classifications for stocks using a client-supplied
     feature specification.
+
+    :param variables: A list of feature columns to use for training. Must exist
+                      in your data.
+    :param trainStart: The starting datetime for training as a string.
+                       ex: `'2017-02-23 06:30:00'`
+    :param trainEnd: The ending datetime for training as a string.
+    :param testStart: The starting datetime for model testing.
+    :param testEnd: The ending datetime for model testing.
+    :param buyThreshold: The confidence threshold for triggering buy logic.
+    :param sellThreshold: The confidence threshold for triggering sell logic.
+    :param C: Penalty parameter for learning algorithm. For noisy data, set to
+              a number less than 1, but in general, 1.0 is suitable.
+    :param gamma: Kernel coefficient for learning algorithm.
+    :param continuedTraining: Determines if values observed in the testing
+                              period will be used to further train the model.
+    :param tz: The timezone associated with the datetime parameters.
     """
     def __init__(self, variables, trainStart, trainEnd, testStart, testEnd,
                  buyThreshold=0.65, sellThreshold=0.65, C=1, gamma=10,
@@ -54,6 +76,13 @@ class Clair(Strategy):
         self.continuedTraining  = continuedTraining
 
     def learn(self, data, X=[], y=[]):
+        """
+        Train the model using data.
+
+        :param data: the data to use for training.
+        :param X: additional support vectors to use with the data.
+        :param y: additional target values to include with data.
+        """
         assert(isinstance(data, History))
 
         for row in data[self.trainStart:self.trainEnd]:
@@ -78,12 +107,22 @@ class Clair(Strategy):
         return model, X, y
 
     def predict(self, model, Xs):
+        """
+        Use trained model to make a prediction on hypothetical support vectors.
+
+        :param model: a trained model
+        :param Xs: input support vectors
+        """
         prediction = model.predict_proba([Xs])[0]
         negative = prediction[0]
         positive = prediction[1]
         return negative, positive
 
     def execute(self, data, model, X=[], y=[]):
+        """
+        Use a trained model to predict the next period's performance. Execute
+        buy and sell logic in response to predictions.
+        """
         assert(isinstance(data, History))
 
         for row in data[self.testStart:self.testEnd]:
