@@ -72,6 +72,7 @@ class Portfolio(Clair):
 
     def buyLogic(self, confidence, row, attrs):
         quote = getattr(row, attrs['Close'])
+        shareOrder=0
 
         if confidence >= 0.9:
             shareOrder = int((self.buyingPower*0.7)/quote)
@@ -83,7 +84,7 @@ class Portfolio(Clair):
             shareOrder = int((self.buyingPower*0.3)/quote)
             self.buyShares(shareOrder, quote)
 
-        if self.debug:
+        if self.debug and shareOrder > 0:
             super().buyLogic(confidence, row, attrs)
             print(f'Bought {shareOrder} @ ${quote}')
 
