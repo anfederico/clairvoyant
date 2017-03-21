@@ -123,18 +123,19 @@ class History:
 
     def __getitem__(self, key):
         if isinstance(key, slice):
+            # Create a deepcopy and crop data to desired range and return it.
             dc = deepcopy(self)
             if isinstance(key.start, int):
                 dc._df = dc._df[key]
-                return dc
-            dc._df['dt'] = pd.to_datetime(dc._df[dc._col_map['Date']])
-            try:
-                dc._df['dt'].apply(dc._timezone.localize)
-            except ValueError:
-                pass
-            mask = (dc._df['dt']>=key.start) & (dc._df['dt']<=key.stop)
-            dc._df = dc._df[mask]
-            dc._df = dc._df.drop('dt', 1)
+            else:
+                dc._df['dt'] = pd.to_datetime(dc._df[dc._col_map['Date']])
+                try:
+                    dc._df['dt'].apply(dc._timezone.localize)
+                except ValueError:
+                    pass
+                mask = (dc._df['dt']>=key.start) & (dc._df['dt']<=key.stop)
+                dc._df = dc._df[mask]
+                dc._df = dc._df.drop('dt', 1)
             return dc
         elif isinstance(key, int):
             return self._df.iloc[key]
