@@ -1,4 +1,4 @@
-<p align="center"><img width=15% src="https://cdn.rawgit.com/uclatommy/Clairvoyant/9de5fee1/media/logo.svg"></p>
+<p align="center"><img width=15% src="https://cdn.rawgit.com/uclatommy/Clairvoyant/976eb66e/media/logo.svg"></p>
 <p align="center"><img width=60% src="https://github.com/uclatommy/Clairvoyant/blob/master/media/Clairvoyant.png"></p>
 
 <p align="center">
