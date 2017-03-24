@@ -11,6 +11,30 @@ from pytz import timezone
 from clairvoyant import Clair
 
 class Backtest(Clair):
+    """
+    Executes machine learning on a dataset and tests performance. Collects trade
+    statistics to allow clients to determine relevance of their chosen features.
+    It implements the same constructor parameters as the parent class.
+
+    :ivar stocks: A list of stock ticker symbols. Has no effect on learning.
+                  Only used for printing information.
+    :ivar dates: Used to print the training and testing begin and end dates.
+    :ivar totalBuys: Total number of buys during the testing period.
+    :ivar correctBuys: The number of times a buy prediction was correct with
+                       respect to next period performance.
+    :ivar totalSells: Total number of sells during the testing period.
+    :ivar correctSells: The number of times a sell prediction was correct with
+                        respect to the next period performance.
+    :ivar increases: The number of possible correct buys (price increases)
+                     during the testing period.
+    :ivar decreases: The number of possible correct sells (price decreases)
+                     during the testing period.
+    :ivar periods: The total number of testing periods.
+    :ivar debug: Set this to True to output detailed trading information.
+    :ivar XX: A numpy array containing the support vectors.
+    :ivar yy: A numpy array containing the target values.
+    :ivar model: An instance of a trained model.
+    """
     def __init__(
             self, variables, trainStart, trainEnd, testStart, testEnd,
             buyThreshold=0.65, sellThreshold=0.65, C=1, gamma=10,
@@ -42,6 +66,9 @@ class Backtest(Clair):
         self.model = None
 
     def runModel(self, data):
+        """
+        Backtest data according to specified parameters.
+        """
         stock = self.stocks[len(self.stocks)-1]
 
         # Learn and execute
@@ -63,16 +90,25 @@ class Backtest(Clair):
         self.model = model
 
     def buyLogic(self, prob, *args, **kwargs):
+        """
+        Increment the buy count.
+        """
         self.totalBuys += 1
         if self.debug:
             super().buyLogic(prob, *args, **kwargs)
 
     def sellLogic(self, prob, *args, **kwargs):
+        """
+        Increment the sell count.
+        """
         self.totalSells += 1
         if self.debug:
             super().sellLogic(prob, *args, **kwargs)
 
     def nextPeriodLogic(self, prediction, performance, *args, **kwargs):
+        """
+        Determine whether the predicted price movement is correct.
+        """
         self.periods += 1
         if performance > 0:
             self.increases += 1
@@ -87,6 +123,9 @@ class Backtest(Clair):
             super().nextPeriodLogic(prediction, performance, *args, **kwargs)
 
     def clearStats(self):
+        """
+        Reset all collected statistics.
+        """
         self.dates = []
         self.totalBuys = 0
         self.correctBuys = 0
@@ -97,18 +136,27 @@ class Backtest(Clair):
         self.periods = 0
 
     def buyStats(self):
+        """
+        Return percentage of correct buys.
+        """
         try:
             return round((float(self.correctBuys)/self.totalBuys)*100,2)
         except ZeroDivisionError:
             return float(0)
 
     def sellStats(self):
+        """
+        Return percentage of correct sells.
+        """
         try:
             return round((float(self.correctSells)/self.totalSells)*100,2)
         except ZeroDivisionError:
             return float(0)
 
     def displayConditions(self):
+        """
+        Print run conditions.
+        """
         bld, gre, red, end = '\033[1m', '\033[92m', '\033[91m', '\033[0m'
 
         print(bld+"Conditions"+end)
@@ -127,6 +175,9 @@ class Backtest(Clair):
         print("Total Price Decreases: "+str(self.decreases))
 
     def displayStats(self):
+        """
+        Display run statistics.
+        """
         bld, gre, red, end = '\033[1m', '\033[92m', '\033[91m', '\033[0m'
 
         if len(self.dates) == 0:
@@ -163,6 +214,10 @@ class Backtest(Clair):
         print("Sell Accuracy:", prnt)
 
     def visualizeModel(self, width = 5, height = 5, stepsize = 0.02):
+        """
+        Produce a svg contour plot of probability distribution with support
+        vectors overlaid as a scatter.
+        """
 
         if len(self.variables) != 2:
             print("Error: Plotting is restricted to 2 dimensions")
