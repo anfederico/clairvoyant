@@ -15,14 +15,14 @@ class Test_History(unittest.TestCase):
             'Influence': 'influence'
             }
         self.sample = History(
-            os.path.join(dir_path,'tsla-sentiment.csv'), col_map=column_map
+            os.path.join(dir_path, 'tsla-sentiment.csv'), col_map=column_map
             )
 
     def test_get_data(self):
         data = self.sample
         self.assertTrue(isinstance(data._df, pd.DataFrame))
         # KeyError happens if the column doesn't exist.
-        self.assertRaises(KeyError, data.__getitem__, 'Blah')\
+        self.assertRaises(KeyError, data.__getitem__, 'Blah')
         # You can get a column by name, returns a series.
         self.assertTrue(isinstance(data['Close'], pd.Series))
         # You can get a column by attribute, returns a series.
@@ -92,4 +92,6 @@ class Test_History(unittest.TestCase):
 
     def test_rate_of_return(self):
         data = self.sample
-        self.assertTrue(np.isclose(data.return_rate[1], -0.00061491160645644951))
+        self.assertTrue(np.isclose(
+            data.return_rate[1], -0.00061491160645644951)
+            )

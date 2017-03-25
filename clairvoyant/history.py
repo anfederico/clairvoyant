@@ -1,12 +1,17 @@
+"""History manages historical stock timeseries data.
+
+This module provides a common interface for ``Clair`` so that she knows how
+your data is formatted. This requires you to define a column map for your data,
+which maps your column names to common names that Clair understands.
+"""
+
 from pytz import timezone
 import pandas as pd
 from copy import deepcopy
 
 
 class History:
-    """
-    Manages model data and exposes a standardized interface regardless of how
-    you name your data columns.
+    """A wrapper for historical stock data.
 
     Convenience features
     You can query for a row by date::
@@ -26,15 +31,17 @@ class History:
 
         history['Open']  # gets a column of data
 
-    :param data: Can be a string representing a csv file or it can be a pandas
-                 dataframe.
-    :param col_map: This parameter is a dict representing a mapping between your
-                    column names to the standardized names. Keys are the
-                    standardized names and the values are the actual column
-                    names found in your data.
-    :param tz: The timezone associated with the datetimes in your data.
-    :param features: The column names to use for training and running your
-                     model.
+    :param data: Client stock data. Can be a string representing a csv file or
+                 it can be a pandas dataframe.
+    :param col_map: A dict mapping your data's column names to common names
+                    where the common names are keys and your custom names are
+                    values. This is an optional parameter. If ``None`` is
+                    provided, History will assume client data is already
+                    formatted with common names.
+    :param tz: The timezone to associate with the datetime in data. Default is
+               UTC time.
+    :param features: A list of column names that informs Clair which columns
+                     can be used as learning features.
 
     :ivar date: Datetime series in data corresponding to the beginning of each
                 period.
@@ -46,6 +53,7 @@ class History:
     :ivar return_rate: Series of percentage change calculated as a percent of
                        opening price.
     """
+
     def __init__(self, data, col_map=None, tz=timezone('UTC'), features=None):
         if col_map is None:
             self._col_map = {
@@ -62,7 +70,7 @@ class History:
             self._df = data
 
         # make sure all column names can be converted in itertuple
-        newnames = {v:k.lower() for k,v in self._col_map.items()}
+        newnames = {v: k.lower() for k, v in self._col_map.items()}
         self.rename(columns=newnames)
 
         if features is None:
@@ -123,19 +131,18 @@ class History:
 
     def __getitem__(self, key):
         if isinstance(key, slice):
-            # Create a deepcopy and crop data to desired range and return it.
             dc = deepcopy(self)
             if isinstance(key.start, int):
                 dc._df = dc._df[key]
-            else:
-                dc._df['dt'] = pd.to_datetime(dc._df[dc._col_map['Date']])
-                try:
-                    dc._df['dt'].apply(dc._timezone.localize)
-                except ValueError:
-                    pass
-                mask = (dc._df['dt']>=key.start) & (dc._df['dt']<=key.stop)
-                dc._df = dc._df[mask]
-                dc._df = dc._df.drop('dt', 1)
+                return dc
+            dc._df['dt'] = pd.to_datetime(dc._df[dc._col_map['Date']])
+            try:
+                dc._df['dt'].apply(dc._timezone.localize)
+            except ValueError:
+                pass
+            mask = (dc._df['dt'] >= key.start) & (dc._df['dt'] <= key.stop)
+            dc._df = dc._df[mask]
+            dc._df = dc._df.drop('dt', 1)
             return dc
         elif isinstance(key, int):
             return self._df.iloc[key]
@@ -146,7 +153,7 @@ class History:
             try:
                 pd.to_datetime(key)  # test conversion to datetime
                 datekey = self._col_map['Date']
-                return self._df.loc[self._df[datekey]==key]
+                return self._df.loc[self._df[datekey] == key]
             except ValueError:
                 pass
             print(f'Invalid column map for {key}.')
@@ -159,17 +166,18 @@ class History:
         return len(self._df)
 
     def read_csv(self, *args, **kwargs):
-        """
+        """Read a csv file.
+
         Exact same interface as ``pandas.read_csv``.
         """
         return pd.read_csv(*args, **kwargs)
 
     def rename(self, *args, **kwargs):
+        """Rename the stored dataframe columns.
+
+        Exposes the exact same interface as ``pandas.DataFrame.rename``.
         """
-        Renames the stored dataframe columns. Exposes the exact same interface
-        as ``pandas.DataFrame.rename``.
-        """
-        old_cols = {v:k for k,v in self._col_map.items()}
+        old_cols = {v: k for k, v in self._col_map.items()}
         for old_col, new_col in kwargs['columns'].items():
             try:
                 self._col_map[old_cols[old_col]] = new_col
@@ -177,10 +185,3 @@ class History:
                 continue
 
         self._df = self._df.rename(*args, **kwargs)
-
-
-    def read_sql(self, *args, **kwargs):
-        """
-        Exact same interface as ``pandas.read_sql``.
-        """
-        return pd.read_sql(*args, **kwargs)

@@ -1,5 +1,10 @@
+"""Clair provides the machine learning brains behind Clairvoyant.
+
+Classes defined by this module provide a framework for implementing machine
+learning algorithms for stock data.
+"""
+
 from sklearn.svm import SVC
-from sklearn.preprocessing import StandardScaler
 from numpy import vstack, hstack
 from pytz import timezone
 from pandas import to_datetime
@@ -8,14 +13,21 @@ from clairvoyant import History
 
 
 class Strategy(metaclass=ABCMeta):
+    """Strategy defines the common interface for implementing recommendations.
+
+    Inherit from Strategy if your class is a type of classifier that determines
+    buying and selling of shares and requires additional logic to respond to
+    model-supplied recommendations.
     """
-    Defines a required interface for any classes which execute on a trained
-    model. These functions determine how the class behaves in response to buy
-    and sell triggers. These functions are intended to be overridden by child
-    classes to implement client-specified logic.
-    """
+
     @abstractmethod
     def buyLogic(self, prob, row, attrs):
+        """Buy shares.
+
+        :param prob: The probability of being in the buy classification.
+        :param row: A named tuple containing a row from ``History`` data.
+        :param attrs: A dict map of attribute names to common names.
+        """
         assert(isinstance(row, tuple))
         assert(isinstance(attrs, dict))
         dt = getattr(row, attrs['Date'])
@@ -23,6 +35,12 @@ class Strategy(metaclass=ABCMeta):
 
     @abstractmethod
     def sellLogic(self, prob, row, attrs):
+        """Sell shares.
+
+        :param prob: The probability of being in the buy classification.
+        :param row: A named tuple containing a row from ``History`` data.
+        :param attrs: A dict map of attribute names to common names.
+        """
         assert(isinstance(row, tuple))
         assert(isinstance(attrs, dict))
         dt = getattr(row, attrs['Date'])
@@ -30,6 +48,16 @@ class Strategy(metaclass=ABCMeta):
 
     @abstractmethod
     def nextPeriodLogic(self, prediction, performance, row, attrs):
+        """Determine what to do next period.
+
+        This is primarily used on testing data to retrospectively evaulate the
+        effectiveness of buying and selling based on particular logic.
+
+        :param prediction: A prediction of performance in the next period.
+        :param performance: Actual stock performance in the next period.
+        :param row: A named tuple containing a row from ``History`` data.
+        :param attrs: A dict map of attribute names to common names.
+        """
         assert(isinstance(row, tuple))
         assert(isinstance(attrs, dict))
         dt = getattr(row, attrs['Date'])
@@ -37,28 +65,44 @@ class Strategy(metaclass=ABCMeta):
 
 
 class Clair(Strategy):
-    """
-    Cla.I.R. - Classifier Inferred Recommendations
-    Clair uses the support vector machine supplied by the sklearn library to
-    to infer buy and sell classifications for stocks using a client-supplied
-    feature specification.
+    """Cla.I.R. - Classifier Inferred Recommendations.
 
-    :param variables: A list of feature columns to use for training. Must exist
-                      in your data.
-    :param trainStart: The starting datetime for training as a string.
-                       ex: `'2017-02-23 06:30:00'`
-    :param trainEnd: The ending datetime for training as a string.
-    :param testStart: The starting datetime for model testing.
-    :param testEnd: The ending datetime for model testing.
-    :param buyThreshold: The confidence threshold for triggering buy logic.
-    :param sellThreshold: The confidence threshold for triggering sell logic.
-    :param C: Penalty parameter for learning algorithm. For noisy data, set to
-              a number less than 1, but in general, 1.0 is suitable.
-    :param gamma: Kernel coefficient for learning algorithm.
-    :param continuedTraining: Determines if values observed in the testing
-                              period will be used to further train the model.
-    :param tz: The timezone associated with the datetime parameters.
+    Clair uses the support vector machine supplied by the sk-learn library to
+    to infer buy and sell classifications for stocks using a client-supplied
+    feature specification. Clair uses the default Radial Basis Function kernel
+    provided by SVC. For more details, see the `scikit learn documentation.
+    <http://scikit-learn.org/stable/modules/svm.html#parameters-of-the-rbf-kernel>`_
+
+    Clients need to provide a date range for the training phase and another
+    range for the testing phase. The learning phase determines classification
+    probabilities that are used in the testing phase.
+
+    :param variables: A list of columns that represent learning features.
+    :param trainStart: A datetime as a string that should be consistent with
+                       the ``tz`` parameter. Defines the start date for model
+                       training.
+    :param trainEnd: A datetime as a string that should be consistent with the
+                     ``tz`` parameter. Defines the end date for model training.
+    :param testStart: A datetime as a string that should be consistent with the
+                      ``tz`` parameter. Defines the start date for model
+                      testing.
+    :param testEnd: A datetime as a string that should be consistent with the
+                    ``tz`` parameter. Defines the end date for model testing.
+    :param buyThreshold: Defines the confidence level at which Clair will
+                         will recommend a buy. Default 0.65.
+    :param sellThreshold: Defines the confidence level at which Clair will
+                          recommend a sell. Default 0.65.
+    :param C: A penalty parameter for false positives. See scikit-learn
+              documentation for more details. Default 1.
+    :param gamma: The kernel coefficient for machine learning. See scikit-learn
+                  documentation for more details. Default 10.
+    :param continuedTraining: Determine if data from the testing period should
+                              be used to continue training the model during the
+                              testing phase. Default False.
+    :param tz: The timezone associated with the datetime parameters. Default
+               UTC.
     """
+
     def __init__(self, variables, trainStart, trainEnd, testStart, testEnd,
                  buyThreshold=0.65, sellThreshold=0.65, C=1, gamma=10,
                  continuedTraining=False, tz=timezone('UTC')):
@@ -73,17 +117,19 @@ class Clair(Strategy):
         self.sellThreshold = sellThreshold
         self.C = C
         self.gamma = gamma
-        self.continuedTraining  = continuedTraining
+        self.continuedTraining = continuedTraining
 
     def learn(self, data, X=[], y=[]):
-        """
-        Train the model using data.
+        """Start the learning phase.
 
-        :param data: the data to use for training.
-        :param X: additional support vectors to use with the data.
-        :param y: additional target values to include with data.
+        :param data: A ``History`` object containing stock data along with
+                     training features.
+        :param X: Optional preprocessed support vectors.
+        :param y: Optional preprocessed target values. Should coincide with the
+                  ``X`` parameter.
         """
         assert(isinstance(data, History))
+        assert(len(X) == len(y))
 
         for row in data[self.trainStart:self.trainEnd]:
             Xs = []
@@ -107,11 +153,10 @@ class Clair(Strategy):
         return model, X, y
 
     def predict(self, model, Xs):
-        """
-        Use trained model to make a prediction on hypothetical support vectors.
+        """Calculate the probability of a buy or sell classification.
 
-        :param model: a trained model
-        :param Xs: input support vectors
+        :param model: A trained model.
+        :param Xs: A list containing support vector data for a single vector.
         """
         prediction = model.predict_proba([Xs])[0]
         negative = prediction[0]
@@ -119,11 +164,17 @@ class Clair(Strategy):
         return negative, positive
 
     def execute(self, data, model, X=[], y=[]):
-        """
-        Use a trained model to predict the next period's performance. Execute
-        buy and sell logic in response to predictions.
+        """Execute the strategy logic using a trained model and input data.
+
+        :param data: A ``History`` object containing testing data.
+        :param model: A trained model.
+        :param X: Optional preprocessed support vectors used for continued
+                  training.
+        :param y: Optional preprocessed target values corresponding to any
+                  supplied support vectors.
         """
         assert(isinstance(data, History))
+        assert(len(X) == len(y))
 
         for row in data[self.testStart:self.testEnd]:
             Xs = []
@@ -132,8 +183,8 @@ class Clair(Strategy):
 
             neg, pos = self.predict(model, Xs)
 
-            if   pos >= self.buyThreshold:
-                prediction =  1
+            if pos >= self.buyThreshold:
+                prediction = 1
             elif neg >= self.sellThreshold:
                 prediction = -1
             else:
@@ -145,13 +196,12 @@ class Clair(Strategy):
                 self.sellLogic(neg, row, data._col_map)
 
             if row.Index < len(data)-1:
-                period = row.Index + 1
-                nextPeriodPerformance = data.return_rate[period]
+                nextPeriodPerformance = data.return_rate[row.Index + 1]
                 self.nextPeriodLogic(
                     prediction, nextPeriodPerformance, row, data._col_map
                     )
 
-            if self.continuedTraining == True:
+            if self.continuedTraining is True:
                 X.append(Xs)
                 if nextPeriodPerformance > 0:
                     y.append(1)
@@ -162,10 +212,13 @@ class Clair(Strategy):
                 model.fit(XX, yy)
 
     def buyLogic(self, prob, row, attrs):
+        """Override this function to provide your own logic."""
         super().buyLogic(prob, row, attrs)
 
     def sellLogic(self, prob, row, attrs):
+        """Override this function to provide your own logic."""
         super().sellLogic(prob, row, attrs)
 
     def nextPeriodLogic(self, prediction, performance, row, attrs):
+        """Override this function to provide your own logic."""
         super().nextPeriodLogic(prediction, performance, row, attrs)
