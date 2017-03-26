@@ -13,7 +13,6 @@ from copy import deepcopy
 class History:
     """A wrapper for historical stock data.
 
-    Convenience features
     You can query for a row by date::
 
         history['2017-02-14 06:30:00']  # get data by a specific date
@@ -30,6 +29,7 @@ class History:
     You can access a column of data by key just like a dataframe::
 
         history['Open']  # gets a column of data
+        history.open     # or access the same data by attribute
 
     :param data: Client stock data. Can be a string representing a csv file or
                  it can be a pandas dataframe.

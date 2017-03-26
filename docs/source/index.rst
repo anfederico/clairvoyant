@@ -6,11 +6,14 @@
 Welcome to Clairvoyant's documentation!
 =======================================
 
+Clairvoyant is a machine learning library designed to identify and monitor
+social/historical cues for short term stock movement
+
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
+   :caption: Documentation
 
-
+   api
 
 Indices and tables
 ==================
