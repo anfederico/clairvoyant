@@ -1,16 +1,55 @@
-import matplotlib
-matplotlib.use('Agg')
-import matplotlib.pyplot as plt
+"""Backtest provides a way of exploring and testing various parameterizations.
 
-from matplotlib.colors import ListedColormap
+This module provides classes that allow clients to experiment with different
+machine learning parameterizations and test those on historical stock data.
+"""
 from numpy import meshgrid, arange, c_
 from sklearn.preprocessing import StandardScaler
 from numpy import vstack, hstack
-from dateutil.parser import parse
 from pytz import timezone
 from clairvoyant import Clair
+import matplotlib
+matplotlib.use('Agg')
+
 
 class Backtest(Clair):
+    """Backtest is a type of machine learning classifier.
+
+    The purpose of ``Backtest`` is to collect statistics on the performance of
+    learned classifications while providing a quick and easy way to vary
+    parameters for rapid experimentation. Backtest also provides some
+    convenience functions for visualizing collected statistics.
+
+    :param variables: A list of columns that represent learning features.
+    :param trainStart: A datetime as a string that should be consistent with
+                       the ``tz`` parameter. Defines the start date for model
+                       training.
+    :param trainEnd: A datetime as a string that should be consistent with the
+                     ``tz`` parameter. Defines the end date for model training.
+    :param testStart: A datetime as a string that should be consistent with the
+                      ``tz`` parameter. Defines the start date for model
+                      testing.
+    :param testEnd: A datetime as a string that should be consistent with the
+                    ``tz`` parameter. Defines the end date for model testing.
+    :param buyThreshold: Defines the confidence level at which Clair will
+                         will recommend a buy. Default 0.65.
+    :param sellThreshold: Defines the confidence level at which Clair will
+                          recommend a sell. Default 0.65.
+    :param C: A penalty parameter for false positives. See scikit-learn
+              documentation for more details. Default 1.
+    :param gamma: The kernel coefficient for machine learning. See scikit-learn
+                  documentation for more details. Default 10.
+    :param continuedTraining: Determine if data from the testing period should
+                              be used to continue training the model during the
+                              testing phase. Default False.
+    :param tz: The timezone associated with the datetime parameters. Default
+               UTC.
+
+    :ivar debug: A boolean value that determines if debug strings will be
+                 printed as backtesting is run. Warning: may result in a lot of
+                 output.
+    """
+
     def __init__(
             self, variables, trainStart, trainEnd, testStart, testEnd,
             buyThreshold=0.65, sellThreshold=0.65, C=1, gamma=10,
@@ -42,8 +81,11 @@ class Backtest(Clair):
         self.model = None
 
     def runModel(self, data):
-        stock = self.stocks[len(self.stocks)-1]
+        """Run backtesting.
 
+        :param data: A ``History`` of stock data that includes observations in
+                     both the training and test phases.
+        """
         # Learn and execute
         model, X, y = self.learn(data)
         self.execute(data, model, X, y)
@@ -62,17 +104,26 @@ class Backtest(Clair):
         self.yy = yy
         self.model = model
 
-    def buyLogic(self, prob, *args, **kwargs):
+    def buyLogic(self, *args, **kwargs):
+        """Increment the buy count."""
         self.totalBuys += 1
         if self.debug:
-            super().buyLogic(prob, *args, **kwargs)
+            super().buyLogic(*args, **kwargs)
 
-    def sellLogic(self, prob, *args, **kwargs):
+    def sellLogic(self, *args, **kwargs):
+        """Increment the sell count."""
         self.totalSells += 1
         if self.debug:
-            super().sellLogic(prob, *args, **kwargs)
+            super().sellLogic(*args, **kwargs)
 
     def nextPeriodLogic(self, prediction, performance, *args, **kwargs):
+        """Collect statistics on correct and incorrect buys and sells.
+
+        :param prediction: Value of 1 or -1 representing an up or down
+                           performance.
+        :param performance: A positive or negative value representing the
+                            actual observed performance.
+        """
         self.periods += 1
         if performance > 0:
             self.increases += 1
@@ -87,6 +138,7 @@ class Backtest(Clair):
             super().nextPeriodLogic(prediction, performance, *args, **kwargs)
 
     def clearStats(self):
+        """Reset all collected statistics."""
         self.dates = []
         self.totalBuys = 0
         self.correctBuys = 0
@@ -97,73 +149,83 @@ class Backtest(Clair):
         self.periods = 0
 
     def buyStats(self):
+        """Return the collected buy statistics."""
         try:
-            return round((float(self.correctBuys)/self.totalBuys)*100,2)
+            return round((float(self.correctBuys)/self.totalBuys)*100, 2)
         except ZeroDivisionError:
             return float(0)
 
     def sellStats(self):
+        """Return the collected sell statistics."""
         try:
-            return round((float(self.correctSells)/self.totalSells)*100,2)
+            return round((float(self.correctSells)/self.totalSells)*100, 2)
         except ZeroDivisionError:
             return float(0)
 
     def displayConditions(self):
-        bld, gre, red, end = '\033[1m', '\033[92m', '\033[91m', '\033[0m'
+        """Print the learning and testing parameters."""
+        bld, end = '\033[1m', '\033[0m'
 
-        print(bld+"Conditions"+end)
+        print(f'{bld}Conditions{end}')
         i = 1
         for var in self.variables:
-            print(("X%s: " % i)+var)
+            print(f"X{i}: {var}")
             i += 1
 
-        print("Buy Threshold: "  + str(self.buyThreshold*100) + "%")
-        print("Sell Threshold: " + str(self.sellThreshold*100) + "%")
-        print("C: " + str(self.C))
-        print("gamma: " + str(self.gamma))
-        print("Continued Training: "+str(self.continuedTraining))
-        print("Total Testing Periods: "+str(self.periods))
-        print("Total Price Increases: "+str(self.increases))
-        print("Total Price Decreases: "+str(self.decreases))
+        print(f"Buy Threshold: {self.buyThreshold*100}%")
+        print(f"Sell Threshold: {self.sellThreshold*100}%")
+        print(f"C: {self.C}")
+        print(f"gamma: {self.gamma}")
+        print(f"Continued Training: {self.continuedTraining}")
+        print(f"Total Testing Periods: {self.periods}")
+        print(f"Total Price Increases: {self.increases}")
+        print(f"Total Price Decreases: {self.decreases}")
 
     def displayStats(self):
+        """Print the collected backtesting statistics."""
         bld, gre, red, end = '\033[1m', '\033[92m', '\033[91m', '\033[0m'
 
         if len(self.dates) == 0:
             print("Error: Please run model before displaying stats")
             return
 
-        print(bld+"Stats"+end)
+        print(f'{bld}Stats{end}')
         print("Stock(s):")
         i = 0
         for stock in self.stocks:
-            print(stock+' |',
-                  "Training: "+self.dates[i][0]+'-'+self.dates[i][1],
-                  "Testing: "+self.dates[i][2]+'-'+self.dates[i][3])
+            print(f'{stock} | ',
+                  f"Training: {self.dates[i][0]}-{self.dates[i][1]}",
+                  f"Testing: {self.dates[i][2]}-{self.dates[i][3]}")
             i += 1
 
-        print("\nTotal Buys: " + str(self.totalBuys))
+        print(f"\nTotal Buys: {self.totalBuys}")
         prnt = None
         if self.buyStats() > 50:
-            prnt = gre+str(self.buyStats())+"%"+end
+            prnt = f"{gre}{self.buyStats()}%{end}"
         elif self.buyStats() < 50:
-            prnt = red+str(self.buyStats())+"%"+end
+            prnt = f"{red}{self.buyStats()}%{end}"
         else:
-            prnt = str(self.buyStats())+"%"
-        print("Buy Accuracy:", prnt)
-
-        print("Total Sells: "   + str(self.totalSells))
+            prnt = f"{self.buyStats()}%"
+        print(f"Buy Accuracy: {prnt}")
+        print(f"Total Sells: {self.totalSells}")
 
         if self.sellStats() > 50:
-            prnt = gre+str(self.sellStats())+"%"+end
+            prnt = f'{gre}{self.sellStats()}%{end}'
         elif self.sellStats() < 50:
-            prnt = red+str(self.sellStats())+"%"+end
+            prnt = f'{red}{self.sellStats()}%{end}'
         else:
-            prnt = str(self.sellStats())+"%"
-        print("Sell Accuracy:", prnt)
+            prnt = f'{self.sellStats()}%'
+        print(f"Sell Accuracy: {prnt}")
 
-    def visualizeModel(self, width = 5, height = 5, stepsize = 0.02):
+    def visualizeModel(self, width=5, height=5, stepsize=0.02):
+        """Output a visualization of the backtesting results.
 
+        The diagram overlays training and testing observations on top of
+        a color coded representation of learned recommendations. The color
+        intensity represents the distribution of probability.
+        """
+        import matplotlib.pyplot as plt
+        from matplotlib.colors import ListedColormap
         if len(self.variables) != 2:
             print("Error: Plotting is restricted to 2 dimensions")
             return
@@ -176,12 +238,14 @@ class Backtest(Clair):
         self.model.fit(X, y)
         x_min, x_max = X[:, 0].min() - 0.5, X[:, 0].max() + 0.5
         y_min, y_max = X[:, 1].min() - 0.5, X[:, 1].max() + 0.5
-        xx, yy = meshgrid(arange(x_min, x_max, stepsize), arange(y_min, y_max, stepsize))
+        xx, yy = meshgrid(
+            arange(x_min, x_max, stepsize), arange(y_min, y_max, stepsize)
+            )
 
         plt.figure(figsize=(width, height))
         cm = plt.cm.RdBu
         RedBlue = ListedColormap(['#FF312E', '#6E8894'])
-        Axes = plt.subplot(1,1,1)
+        Axes = plt.subplot(1, 1, 1)
         Z = self.model.decision_function(c_[xx.ravel(), yy.ravel()])
         Z = Z.reshape(xx.shape)
 

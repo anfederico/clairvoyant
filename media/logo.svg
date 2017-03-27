@@ -10,9 +10,9 @@
    xmlns:xlink="http://www.w3.org/1999/xlink"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="200"
-   height="200"
-   viewBox="0 0 200 200"
+   width="125"
+   height="125"
+   viewBox="0 0 125 125"
    id="svg4613"
    version="1.1"
    inkscape:version="0.91 r13725"
@@ -1111,12 +1111,12 @@
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
      id="layer1"
-     transform="translate(0,-852.36216)">
+     transform="translate(0,-927.36216)">
     <g
        id="layer3"
        inkscape:label="Layer 3"
        style="display:inline;opacity:1"
-       transform="matrix(0.74913473,0,0,0.74913578,-13.267946,928.62193)">
+       transform="matrix(0.46820921,0,0,0.46820986,-8.2924666,975.02452)">
       <g
          transform="matrix(1.0507459,0,0,1.0507459,-747.1892,-961.64528)"
          id="g4726"
