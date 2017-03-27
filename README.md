@@ -11,6 +11,9 @@
 <a href="https://www.python.org/">
      <img src="https://img.shields.io/badge/python-3.6%2B-blue.svg">
 </a>
+<a href="https://uclatommy.github.io/Clairvoyant/">
+    <img src="https://img.shields.io/badge/docs-0.2.0-blue.svg?style=flat">
+</a>
 <a href="https://opensource.org/licenses/MIT">
      <img src="https://img.shields.io/badge/license-MIT%20License-brightgreen.svg">
 </a>
