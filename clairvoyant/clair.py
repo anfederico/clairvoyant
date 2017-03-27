@@ -77,6 +77,9 @@ class Clair(Strategy):
     range for the testing phase. The learning phase determines classification
     probabilities that are used in the testing phase.
 
+    Once the model is reliably trained, clients may use the :func:`predict`
+    function to predict a result given an observed support vector.
+
     :param variables: A list of columns that represent learning features.
     :param trainStart: A datetime as a string that should be consistent with
                        the ``tz`` parameter. Defines the start date for model

@@ -119,7 +119,8 @@ class Backtest(Clair):
     def nextPeriodLogic(self, prediction, performance, *args, **kwargs):
         """Collect statistics on correct and incorrect buys and sells.
 
-        :param prediction: A 1 or -1 representing an up or down performance.
+        :param prediction: Value of 1 or -1 representing an up or down
+                           performance.
         :param performance: A positive or negative value representing the
                             actual observed performance.
         """
