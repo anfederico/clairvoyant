@@ -166,40 +166,40 @@ class Portfolio:
         if (shares*quote) <= self.buyingPower:
             self.buyingPower -= shares*quote
             self.shares += shares  
-        else: print "Sorry, insufficient buying power."    
+        else: print("Sorry, insufficient buying power.")    
     
     def sellShares(self, shares, quote):
         if shares <= self.shares:
             self.buyingPower += shares*quote
             self.shares -= shares    
-        else: print "Sorry, you don't own this many shares."
+        else: print("Sorry, you don't own this many shares.")
     
     def displayLastRun(self):
         bld, gre, red, end = '\033[1m', '\033[92m', '\033[91m', '\033[0m'
    
-        if self.runs < 1: print "Error: No last run"; return
+        if self.runs < 1: print("Error: No last run"); return
         
-        print bld+"Run #"+str(self.runs)+end
-        print "Buying Power: $" + str(round(self.buyingPower,2)) 
-        print "Shares: " + str(self.shares) 
+        print(bld+"Run #"+str(self.runs)+end)
+        print("Buying Power: $" + str(round(self.buyingPower,2))) 
+        print("Shares: " + str(self.shares)) 
         
         totalValue = round(self.buyingPower+self.shares*self.lastQuote,2)
-        if totalValue > self.startingBalance:   print "Total Value: $" + gre+str(round(self.buyingPower+self.shares*self.lastQuote,2))+end
-        elif totalValue < self.startingBalance: print "Total Value: $" + red+str(round(self.buyingPower+self.shares*self.lastQuote,2))+end            
-        else:                                   print "Total Value: $" + str(round(self.buyingPower+self.shares*self.lastQuote,2)) 
+        if totalValue > self.startingBalance:   print("Total Value: $" + gre+str(round(self.buyingPower+self.shares*self.lastQuote,2))+end)
+        elif totalValue < self.startingBalance: print("Total Value: $" + red+str(round(self.buyingPower+self.shares*self.lastQuote,2))+end)            
+        else:                                   print("Total Value: $" + str(round(self.buyingPower+self.shares*self.lastQuote,2))) 
         
     def displayAllRuns(self):
         bld, gre, red, end = '\033[1m', '\033[92m', '\033[91m', '\033[0m'
 
-        print bld+"Performance across all runs"+end
-        print "Runs: "+str(self.runs)
+        print(bld+"Performance across all runs"+end)
+        print("Runs: "+str(self.runs))
         
         try: averagePerformance = round(sum(self.performances)/len(self.performances),2)
-        except ZeroDivisionError: print "Average Performance: None\n"; return
+        except ZeroDivisionError: print("Average Performance: None\n"); return
         
-        if averagePerformance > 0:   print "Average Performance: "+gre+str(averagePerformance)+"%"+end
-        elif averagePerformance < 0: print "Average Performance: "+red+str(averagePerformance)+"%"+end
-        else:                        print "Average Performance: "+str(averagePerformance)+"%"
+        if averagePerformance > 0:   print("Average Performance: "+gre+str(averagePerformance)+"%"+end)
+        elif averagePerformance < 0: print("Average Performance: "+red+str(averagePerformance)+"%"+end)
+        else:                        print("Average Performance: "+str(averagePerformance)+"%")
     
     def clearAllRuns(self):
         self.startingBalance = 0
