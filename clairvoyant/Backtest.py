@@ -191,53 +191,53 @@ class Backtest:
     def displayConditions(self):
         bld, gre, red, end = '\033[1m', '\033[92m', '\033[91m', '\033[0m'
         
-        print bld+"Conditions"+end
+        print(bld+"Conditions"+end)
         i = 1
         for var in self.variables: 
-            print ("X%s: " % i)+var
+            print(("X%s: " % i)+var)
             i += 1
             
-        print "Buy Threshold: "  + str(self.buyThreshold*100) + "%"
-        print "Sell Threshold: " + str(self.sellThreshold*100) + "%"
-        print "C: " + str(self.C)
-        print "gamma: " + str(self.gamma)
-        print "Continued Training: "+str(self.continuedTraining)
+        print("Buy Threshold: "  + str(self.buyThreshold*100) + "%")
+        print("Sell Threshold: " + str(self.sellThreshold*100) + "%")
+        print("C: " + str(self.C))
+        print("gamma: " + str(self.gamma))
+        print("Continued Training: "+str(self.continuedTraining))
     
     def displayStats(self):
         bld, gre, red, end = '\033[1m', '\033[92m', '\033[91m', '\033[0m'
         
         if len(self.dates) == 0:
-            print "Error: Please run model before displaying stats"
+            print("Error: Please run model before displaying stats")
             return
         
-        print bld+"Stats"+end
-        print "Stock(s):"
+        print(bld+"Stats"+end)
+        print("Stock(s):")
         i = 0
         for stock in self.stocks:
-            print stock+' |',
-            print "Training: "+self.dates[i][0]+'-'+self.dates[i][1],
-            print "Testing: "+self.dates[i][2]+'-'+self.dates[i][3]
+            print(stock+' |', end=' ')
+            print("Training: "+self.dates[i][0]+'-'+self.dates[i][1], end=' ')
+            print("Testing: "+self.dates[i][2]+'-'+self.dates[i][3])
             i += 1
         
-        print "\nTotal Buys: " + str(self.totalBuys)
-        print "Buy Accuracy:", 
-        if   self.buyStats() > 50: print gre+str(self.buyStats())+"%"+end 
-        elif self.buyStats() < 50: print red+str(self.buyStats())+"%"+end 
-        else:                      print str(self.buyStats())+"%"
+        print("\nTotal Buys: " + str(self.totalBuys))
+        print("Buy Accuracy:", end=' ') 
+        if   self.buyStats() > 50: print(gre+str(self.buyStats())+"%"+end) 
+        elif self.buyStats() < 50: print(red+str(self.buyStats())+"%"+end) 
+        else:                      print(str(self.buyStats())+"%")
         
-        print "Total Sells: "   + str(self.totalSells)
-        print "Sell Accuracy:", 
-        if   self.sellStats() > 50: print gre+str(self.sellStats())+"%"+end 
-        elif self.sellStats() < 50: print red+str(self.sellStats())+"%"+end 
-        else:                       print str(self.sellStats())+"%"
+        print("Total Sells: "   + str(self.totalSells))
+        print("Sell Accuracy:", end=' ') 
+        if   self.sellStats() > 50: print(gre+str(self.sellStats())+"%"+end) 
+        elif self.sellStats() < 50: print(red+str(self.sellStats())+"%"+end) 
+        else:                       print(str(self.sellStats())+"%")
         
     def visualizeModel(self, width = 5, height = 5, stepsize = 0.02):
         
         if len(self.variables) != 2:
-            print "Error: Plotting is restricted to 2 dimensions"
+            print("Error: Plotting is restricted to 2 dimensions")
             return
         if (self.XX == None or self.yy == None or self.model == None):
-            print "Error: Please run model before visualizing"
+            print("Error: Please run model before visualizing")
             return
             
         X, y = self.XX, self.yy                                   # Retrieve previous XX and yy                                      
