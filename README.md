@@ -26,11 +26,7 @@ Using stock historical data, train a supervised learning algorithm with any comb
 pip install clairvoyant
 ```
 
-<br>
-
-## Basic Code Examples
-
-#### Backtesting Signal Accuracy
+## Backtesting Signal Accuracy
 During the testing period, the model signals to buy or sell based on its prediction for price
 movement the following day. By putting your trading algorithm aside and testing for signal accuracy
 alone, you can rapidly build and test more reliable models.
@@ -64,7 +60,7 @@ backtest.statistics()
 backtest.visualize('SBUX')
 ```
 
-#### View Results
+#### Output
 ```text
 ------------ Data Features ------------
 
@@ -101,7 +97,9 @@ Sell Accuracy: 59.3%
 ---------------------------------------
 ```
 
-#### Simulate a Trading Strategy
+<img src="https://github.com/anfederico/Clairvoyant/blob/master/media/SBUX.png">
+
+## Simulate a Trading Strategy
 Once you've established your model can accurately predict price movement a day in advance, 
 simulate a portfolio and test your performance with a particular stock. User defined trading logic
 lets you control the flow of your capital based on the model's confidence in its prediction
@@ -130,7 +128,8 @@ simulation.statistics()
 simulation.chart()
 ```
 
-#### View Results
+#### Output
+
 ```text
 ------------- Statistics --------------
 
@@ -148,7 +147,7 @@ Total Trades : 350
 ---------------------------------------
 ```
 
-#### View Results
+<img src="https://raw.githubusercontent.com/anfederico/Clairvoyant/master/media/Chart.png">
 
 ## Other Projects
 #### Intensive Backtesting
