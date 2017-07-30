@@ -6,7 +6,7 @@ Contributing
 3. Make sure that your commit messages clearly describe the changes.
 4. Send a pull request.
 
-Before writing code, file an issue
+File an Issue
 ----------------------------------
 
 Use the issue tracker to start the discussion. It is possible that someone
@@ -31,7 +31,7 @@ Be sure to add the relevant tests before making the pull request. Docs will be
 updated automatically when we merge to `master`, but you should also build
 the docs yourself and make sure they're readable.
 
-Make the pull request
+Make the Pull Request
 ---------------------
 
 Once you have made all your changes, tests, and updated the documentation,
