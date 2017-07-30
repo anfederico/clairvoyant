@@ -148,16 +148,9 @@ Total Trades : 350
 ---------------------------------------
 ```
 
-## Other Notes...
+#### View Results
 
-#### Multivariate Functionality
-Remember, more is not always better!
-```python
-variables = ["SSO"]                            # 1 feature
-variables = ["SSO", "SSC"]                     # 2 features
-variables = ["SSO", "SSC", "RSI"]              # 3 features
-variables = ["SSO", "SSC", "RSI", ... , "Xn"]  # n features
-```
+## Other Projects
 #### Intensive Backtesting
 The primary purpose of this project is to rapidly test datasets on machine learning algorithms (specifically Support Vector Machines). While the Simulation class allows for basic strategy testing, there are other projects more suited for that task. Once you've tested patterns within your data and simulated a basic strategy, I'd recommend taking your model to the next level with:
 ```text
@@ -169,3 +162,20 @@ The examples shown use data derived from a project where we are data mining soci
 ```text
 https://github.com/Crypto-AI/Stocktalk
 ```
+
+## Notes
+#### Multivariate Functionality
+Remember, more is not always better!
+```python
+variables = ["SSO"]                            # 1 feature
+variables = ["SSO", "SSC"]                     # 2 features
+variables = ["SSO", "SSC", "RSI"]              # 3 features
+variables = ["SSO", "SSC", "RSI", ... , "Xn"]  # n features
+```
+
+## Contributing
+Please take a look at our [contributing](https://github.com/anfederico/Clairvoyant/blob/master/contributing.md) guidelines if you're interested in helping!
+#### Pending Features
+Export model
+Support for multiple sklearn SVM models
+Visualization for models with more than 2 features
