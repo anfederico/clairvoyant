@@ -125,7 +125,7 @@ def logic(account, today, prediction, confidence):
 simulation = backtester.Simulation(features, trainStart, trainEnd, testStart, testEnd, buyThreshold, sellThreshold, continuedTraining)
 simulation.start(data, 1000, logic, kernel='rbf', C=1, gamma=10)
 simulation.statistics()
-simulation.chart()
+simulation.chart('SBUX')
 ```
 
 #### Output
