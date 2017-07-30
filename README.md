@@ -174,7 +174,7 @@ variables = ["SSO", "SSC", "RSI", ... , "Xn"]  # n features
 ```
 
 ## Contributing
-Please take a look at our [contributing](https://github.com/anfederico/Clairvoyant/blob/master/contributing.md) guidelines if you're interested in helping!
+Please take a look at our [contributing](https://github.com/anfederico/Clairvoyant/blob/master/CONTRIBUTING.md) guidelines if you're interested in helping!
 #### Pending Features
 - Export model
 - Support for multiple sklearn SVM models
