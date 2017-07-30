@@ -2,7 +2,8 @@ language: python
 python:
   - "3.6"
 
-before_install: - pip3 install numpy scipy
+before_install: 
+  - pip3 install numpy scipy
 
 install: 
   - pip3 install -r requirements.txt
