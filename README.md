@@ -48,8 +48,7 @@ continuedTraining = False    # Continue training during testing period? (default
 backtest = backtester.Backtest(features, trainStart, trainEnd, testStart, testEnd, buyThreshold, sellThreshold, continuedTraining)
 
 # A little bit of pre-processing
-data = pd.read_csv("SBUX.csv")              
-data['date'] = pd.to_datetime(data['date'])
+data = pd.read_csv("SBUX.csv", date_parser=['date'])
 data = data.round(3)                                    
 
 # Start backtesting and optionally modify SVC parameters
