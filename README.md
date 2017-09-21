@@ -32,7 +32,7 @@ movement the following day. By putting your trading algorithm aside and testing 
 alone, you can rapidly build and test more reliable models.
 
 ```python
-import backtester
+from clairvoyant.engine import Backtest
 import pandas as pd
 
 features  = ["EMA", "SSO"]   # Financial indicators of choice
@@ -45,7 +45,7 @@ sellThreshold = 0.65         # Confidence threshold for predicting sell (default
 continuedTraining = False    # Continue training during testing period? (default = false)
 
 # Initialize backtester
-backtest = backtester.Backtest(features, trainStart, trainEnd, testStart, testEnd, buyThreshold, sellThreshold, continuedTraining)
+backtest = Backtest(features, trainStart, trainEnd, testStart, testEnd, buyThreshold, sellThreshold, continuedTraining)
 
 # A little bit of pre-processing
 data = pd.read_csv("SBUX.csv", date_parser=['date'])
