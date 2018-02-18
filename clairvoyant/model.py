@@ -2,6 +2,7 @@ from sklearn.svm           import SVC
 from sklearn.preprocessing import RobustScaler
 from numpy                 import vstack, hstack
 
+# Abstract model class to support any machine learning APIs
 class Model:
     def __init__(self, **kwargs):
         raise NotImplementedError

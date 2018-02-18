@@ -1,29 +1,13 @@
-from sklearn.svm           import SVC
-from sklearn.preprocessing import RobustScaler
 from matplotlib.colors     import ListedColormap
 from matplotlib            import pyplot
 from bokeh.plotting        import output_file, figure, show
-from numpy                 import vstack, hstack, meshgrid, arange, c_, where
+from numpy                 import meshgrid, arange, c_, where
+from model                 import SciKitModel as Model
 
 # Local imports
 import sys
 sys.path.append("..")
 from clairvoyant import exchange, helpers
-
-class Model:
-    def __init__(self, **kwargs):
-        self.kwargs = kwargs
-        self.svc = SVC(**kwargs, probability=True)
-
-    def fit(self, X, y):
-        self.XX = vstack(X)
-        self.yy = hstack(y)
-        self.scaler = RobustScaler().fit(self.XX)
-        self.svc.fit(self.scaler.transform(self.XX), self.yy)
-
-    def predict(self, Xs):
-        prediction = self.svc.predict_proba(self.scaler.transform([Xs]))[0]
-        return prediction[0], prediction[1] # Negative, Positive
 
 class Engine:
     def __init__(self, features, trainStr, trainEnd, testStr, testEnd, buyThreshold=0.65, sellThreshold=0.65, continueTraining=False):
