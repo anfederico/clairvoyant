@@ -1,6 +1,7 @@
-from sklearn.svm           import SVC
+from sklearn.svm import SVC
 from sklearn.preprocessing import RobustScaler
-from numpy                 import vstack, hstack
+from numpy import vstack, hstack
+
 
 # Abstract model class to support any machine learning APIs
 class Model:
@@ -13,10 +14,15 @@ class Model:
     def predict(self, Xs):
         raise NotImplementedError
 
+
 class SciKitModel(Model):
     def __init__(self, **kwargs):
+        super().__init__(**kwargs)
         self.kwargs = kwargs
         self.svc = SVC(**kwargs, probability=True)
+        self.XX = None
+        self.yy = None
+        self.scaler = None
 
     def fit(self, X, y):
         self.XX = vstack(X)
