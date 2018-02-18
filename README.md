@@ -112,13 +112,13 @@ def logic(account, today, prediction, confidence):
         EntryPrice   = today['close']
         EntryCapital = account.BuyingPower*Risk
         if EntryCapital >= 0:
-            account.EnterPosition('Long', EntryCapital, EntryPrice)
+            account.enter_position('Long', EntryCapital, EntryPrice)
 
     if prediction == -1:
         ExitPrice = today['close']
         for Position in account.Positions:  
             if Position.Type == 'Long':
-                account.ClosePosition(Position, 1.0, ExitPrice)
+                account.close_position(Position, 1.0, ExitPrice)
 
 
 simulation = backtester.Simulation(features, trainStart, trainEnd, testStart, testEnd, buyThreshold, sellThreshold, continuedTraining)

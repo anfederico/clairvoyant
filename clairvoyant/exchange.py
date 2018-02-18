@@ -3,109 +3,116 @@ import copy
 
 class OpenedTrade():
     def __init__(self, Type, Date):
-        self.Type = Type
-        self.Date = Date
+        self.type = Type
+        self.date = Date
 
     def __str__(self):
-        return "{0}\n{1}".format(self.Type, self.Date)
+        return "{0}\n{1}".format(self.type, self.date)
 
 
 class ClosedTrade(OpenedTrade):
-    def __init__(self, Type, Date, Shares, Entry, Exit):
-        super().__init__(Type, Date)
-        self.Shares = float(Shares)
-        self.Entry = float(Entry)
-        self.Exit = float(Exit)
+    def __init__(self, _type, date, shares, entry, exit):
+        super().__init__(_type, date)
+        self.shares = float(shares)
+        self.entry = float(entry)
+        self.exit = float(exit)
 
     def __str__(self):
-        return "{0}\n{1}\n{2}\n{3}\n{4}".format(self.Type, self.Date, self.Shares, self.Entry, self.Exit)
+        return "{0}\n{1}\n{2}\n{3}\n{4}".format(self.type, self.date, self.shares, self.entry, self.exit)
 
 
 class Position:
-    def __init__(self, No, EntryPrice, Shares, ExitPrice=0, StopLoss=0):
-        self.No = No
-        self.Type = "None"
-        self.EntryPrice = float(EntryPrice)
-        self.Shares = float(Shares)
-        self.ExitPrice = float(ExitPrice)
-        self.StopLoss = float(StopLoss)
+    def __init__(self, no, entry_price, shares, exit_price=0, stop_loss=0):
+        self.no = no
+        self.type = "None"
+        self.entry_price = float(entry_price)
+        self.shares = float(shares)
+        self.exit_price = float(exit_price)
+        self.stop_loss = float(stop_loss)
     
     def show(self):
-        print("No. {0}".format(self.No))
-        print("Type:   {0}".format(self.Type))
-        print("Entry:  {0}".format(self.EntryPrice))
-        print("Shares: {0}".format(self.Shares))
-        print("Exit:   {0}".format(self.ExitPrice))
-        print("Stop:   {0}\n".format(self.StopLoss))
+        print("No. {0}".format(self.no))
+        print("Type:   {0}".format(self.type))
+        print("Entry:  {0}".format(self.entry_price))
+        print("Shares: {0}".format(self.shares))
+        print("Exit:   {0}".format(self.exit_price))
+        print("Stop:   {0}\n".format(self.stop_loss))
 
 
 class LongPosition(Position):
-    def __init__(self, No, EntryPrice, Shares, ExitPrice=0, StopLoss=0):
-        super().__init__(No, EntryPrice, Shares, ExitPrice, StopLoss)
-        self.Type = 'Long'
+    def __init__(self, no, entry_price, shares, exit_price=0, stop_loss=0):
+        super().__init__(no, entry_price, shares, exit_price, stop_loss)
+        self.type = 'Long'
 
-    def Close(self, Percent, CurrentPrice):
-        Shares = self.Shares
-        self.Shares *= 1.0-Percent
-        return Shares*Percent*CurrentPrice
+    def close(self, percent, current_price):
+        shares = self.shares
+        self.shares *= 1.0 - percent
+        return shares*percent*current_price
 
 
 class ShortPosition(Position):
-    def __init__(self, No, EntryPrice, Shares, ExitPrice=0, StopLoss=0):
-        super().__init__(No, EntryPrice, Shares, ExitPrice, StopLoss)
-        self.Type = 'Short' 
+    def __init__(self, no, entry_price, shares, exit_price=0, stop_loss=0):
+        super().__init__(no, entry_price, shares, exit_price, stop_loss)
+        self.type = 'Short'
 
-    def Close(self, Percent, CurrentPrice):
-        Entry = self.Shares*Percent*self.EntryPrice
-        Exit = self.Shares*Percent*CurrentPrice
-        self.Shares *= 1.0-Percent
-        if Entry-Exit+Entry <= 0: return 0
-        else: return Entry-Exit+Entry
+    def close(self, percent, current_price):
+        entry = self.shares * percent * self.entry_price
+        _exit = self.shares * percent * current_price
+        self.shares *= 1.0 - percent
+        if entry-_exit+entry <= 0:
+            return 0
+        else:
+            return entry-_exit+entry
 
 
 class Account():
-    def __init__(self, InitialCapital):
-        self.InitialCapital = float(InitialCapital)
-        self.BuyingPower = float(InitialCapital)
-        self.No = 0
-        self.Date = None
-        self.Equity = []
-        self.Positions = []
-        self.OpenedTrades = []
-        self.ClosedTrades = []
+    def __init__(self, initial_capital):
+        self.initial_capital = float(initial_capital)
+        self.buying_power = float(initial_capital)
+        self.no = 0
+        self.date = None
+        self.equity = []
+        self.positions = []
+        self.opened_trades = []
+        self.closed_trades = []
 
-    def EnterPosition(self, Type, EntryCapital, EntryPrice, ExitPrice=0, StopLoss=0):
-        EntryCapital = float(EntryCapital)
-        if EntryCapital < 0: raise ValueError("Error: Entry capital must be positive")          
-        elif EntryPrice < 0: raise ValueError("Error: Entry price cannot be negative.")
-        elif self.BuyingPower < EntryCapital: raise ValueError("Error: Not enough buying power to enter position")          
+    def enter_position(self, type, entry_capital, entry_price, exit_price=0, stop_loss=0):
+        entry_capital = float(entry_capital)
+        if entry_capital < 0: raise ValueError("Error: Entry capital must be positive")
+        elif entry_price < 0: raise ValueError("Error: Entry price cannot be negative.")
+        elif self.buying_power < entry_capital: raise ValueError("Error: Not enough buying power to enter position")
         else: 
-            self.BuyingPower -= EntryCapital
-            Shares = EntryCapital/EntryPrice 
-            if Type == 'Long': self.Positions.append(LongPosition(self.No, EntryPrice, Shares, ExitPrice, StopLoss))
-            elif Type == 'Short': self.Positions.append(ShortPosition(self.No, EntryPrice, Shares, ExitPrice, StopLoss))    
-            else: raise TypeError("Error: Invalid position type.")
+            self.buying_power -= entry_capital
+            shares = entry_capital/entry_price
+            if type == 'Long':
+                self.positions.append(LongPosition(self.no, entry_price, shares, exit_price, stop_loss))
+            elif type == 'Short':
+                self.positions.append(ShortPosition(self.no, entry_price, shares, exit_price, stop_loss))
+            else:
+                raise TypeError("Error: Invalid position type.")
 
-            self.OpenedTrades.append(OpenedTrade(Type, self.Date))
-            self.No += 1    
+            self.opened_trades.append(OpenedTrade(type, self.date))
+            self.no += 1
 
-    def ClosePosition(self, Position, Percent, CurrentPrice):
-        if Percent > 1 or Percent < 0: 
+    def close_position(self, position, percent, current_price):
+        if percent > 1 or percent < 0:
             raise ValueError("Error: Percent must range between 0-1.")
-        elif CurrentPrice < 0:
+        elif current_price < 0:
             raise ValueError("Error: Current price cannot be negative.")                
         else: 
-            self.ClosedTrades.append(ClosedTrade(Position.Type, self.Date, Position.Shares*Percent, Position.EntryPrice, CurrentPrice))
-            self.BuyingPower += Position.Close(Percent, CurrentPrice)
+            self.closed_trades.append(ClosedTrade(position.type, self.date, position.shares * percent,
+                                                  position.entry_price, current_price))
+            self.buying_power += position.close(percent, current_price)
 
-    def PurgePositions(self):
-        self.Positions = [p for p in self.Positions if p.Shares > 0]        
+    def purge_positions(self):
+        self.positions = [p for p in self.positions if p.Shares > 0]
             
-    def ShowPositions(self):
-        for p in self.Positions: p.show()
+    def show_positions(self):
+        for p in self.positions:
+            p.show()
 
-    def TotalValue(self, CurrentPrice):
-        Temporary = copy.deepcopy(self)
-        for Position in Temporary.Positions:
-            Temporary.ClosePosition(Position, 1.0, CurrentPrice)
-        return Temporary.BuyingPower
+    def total_value(self, current_price):
+        temporary = copy.deepcopy(self)
+        for position in temporary.positions:
+            temporary.close_position(position, 1.0, current_price)
+        return temporary.buying_power

@@ -92,14 +92,14 @@ class Engine:
             
             if simulation:
                 # Update account variables
-                self.account.Date = data.iloc[i]['date']
-                self.account.Equity.append(self.account.TotalValue(data.iloc[i]['close']))
+                self.account.date = data.iloc[i]['date']
+                self.account.equity.append(self.account.total_value(data.iloc[i]['close']))
 
                 # Execute trading logic
                 logic(self.account, data.iloc[i], prediction, confidence)
 
                 # Cleanup empty positions
-                self.account.PurgePositions()
+                self.account.purge_positions()
 
             if not simulation:
                 # ==================================== #
@@ -180,12 +180,12 @@ class Engine:
         Z = self.model.svc.decision_function(c_[xx.ravel(), yy.ravel()])
         Z = Z.reshape(xx.shape)
         
-        Axes = pyplot.subplot(1,1,1)
-        Axes.set_title(name)
-        Axes.contourf(xx, yy, Z, cmap=cm, alpha=0.75)
-        Axes.scatter(X[:, 0], X[:, 1], s=20, c=y, cmap=rb, edgecolors='black') 
-        Axes.set_xlim(xx.min(), xx.max())
-        Axes.set_ylim(yy.min(), yy.max())
+        axes = pyplot.subplot(1,1,1)
+        axes.set_title(name)
+        axes.contourf(xx, yy, Z, cmap=cm, alpha=0.75)
+        axes.scatter(X[:, 0], X[:, 1], s=20, c=y, cmap=rb, edgecolors='black')
+        axes.set_xlim(xx.min(), xx.max())
+        axes.set_ylim(yy.min(), yy.max())
         pyplot.savefig("{0}.png".format(name))
 
 
@@ -243,7 +243,7 @@ class Simulation(Engine):
         print("Buy and Hold : {0}%".format(round(percent_change*100, 2)))
         print("Net Profit   : {0}".format(round(helpers.profit(self.account.InitialCapital, percent_change), 2)))
         
-        percent_change = helpers.change(self.account.InitialCapital, self.account.TotalValue(final_price))
+        percent_change = helpers.change(self.account.InitialCapital, self.account.total_value(final_price))
         print("Strategy     : {0}%".format(round(percent_change*100, 2)))
         print("Net Profit   : {0}".format(round(helpers.profit(self.account.InitialCapital, percent_change), 2)))
 
