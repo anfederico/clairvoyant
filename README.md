@@ -158,7 +158,7 @@ https://github.com/Crypto-AI/Gemini
 #### Social Sentiment Scores
 The examples shown use data derived from a project where we are data mining social media and performing stock sentiment analysis. To get an idea of how we do that, please take a look at:
 ```text
-https://github.com/Crypto-AI/Stocktalk
+https://github.com/anfederico/Stocktalk
 ```
 
 ## Notes
