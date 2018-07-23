@@ -152,7 +152,7 @@ Total Trades : 350
 #### Intensive Backtesting
 The primary purpose of this project is to rapidly test datasets on machine learning algorithms (specifically Support Vector Machines). While the Simulation class allows for basic strategy testing, there are other projects more suited for that task. Once you've tested patterns within your data and simulated a basic strategy, I'd recommend taking your model to the next level with:
 ```text
-https://github.com/Crypto-AI/Gemini
+https://github.com/anfederico/Gemini
 ```
 
 #### Social Sentiment Scores
