@@ -13,7 +13,7 @@ from clairvoyant import exchange, helpers
 class Model:
     def __init__(self, **kwargs):
         self.kwargs = kwargs
-        self.svc = SVC(**kwargs, probability=True)
+        self.svc = SVC(probability=True, **kwargs)
 
     def fit(self, X, y):
         self.XX = vstack(X)
