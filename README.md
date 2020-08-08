@@ -22,13 +22,13 @@ Using stock historical data, train a supervised learning algorithm with any comb
 <br>
 
 ## Last Stable Release
-```python
+```bash
 pip install clairvoyant
 ```
 
 ## Latest Development Changes
 ```bash
-git clone https://github.com/anfederico/Clairvoyant
+pip install git+git://github.com/anfederico/Clairvoyant
 ```
 
 ## Backtesting Signal Accuracy
