@@ -1,34 +1,34 @@
-<p align="center"><img width=12.5% src="https://github.com/anfederico/Clairvoyant/blob/master/media/Logo.png"></p>
-<p align="center"><img width=60% src="https://github.com/anfederico/Clairvoyant/blob/master/media/Clairvoyant.png"></p>
+<p align="center"><img width=12.5% src="https://github.com/anfederico/clairvoyant/blob/master/media/Logo.png"></p>
+<p align="center"><img width=60% src="https://github.com/anfederico/clairvoyant/blob/master/media/Clairvoyant.png"></p>
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 ![Python](https://img.shields.io/badge/python-v3.6+-blue.svg)
-[![Build Status](https://travis-ci.org/anfederico/Clairvoyant.svg?branch=master)](https://travis-ci.org/anfederico/Clairvoyant)
+[![Build Status](https://travis-ci.org/anfederico/clairvoyant.svg?branch=master)](https://travis-ci.org/anfederico/clairvoyant)
 ![Dependencies](https://img.shields.io/badge/dependencies-up%20to%20date-brightgreen.svg)
-[![GitHub Issues](https://img.shields.io/github/issues/anfederico/Clairvoyant.svg)](https://github.com/anfederico/Clairvoyant/issues)
+[![GitHub Issues](https://img.shields.io/github/issues/anfederico/clairvoyant.svg)](https://github.com/anfederico/clairvoyant/issues)
 ![Contributions welcome](https://img.shields.io/badge/contributions-welcome-orange.svg)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
 ## Basic Overview
 
 Using stock historical data, train a supervised learning algorithm with any combination of financial indicators. Rapidly backtest your model for accuracy and simulate investment portfolio performance. 
-<p align="center"><img width=95% src="https://github.com/anfederico/Waldo/blob/master/media/Schematic.png"></p>
+<p align="center"><img width=95% src="https://github.com/anfederico/clairvoyant/blob/master/media/Schematic.png"></p>
 
 <br>
 
 ## Visualize the Learning Process
-<img src="https://github.com/anfederico/Clairvoyant/blob/master/media/Learning.gif" width=40%>
+<img src="https://github.com/anfederico/clairvoyant/blob/master/media/Learning.gif" width=40%>
 
 <br>
 
 ## Last Stable Release
-```python
+```bash
 pip install clairvoyant
 ```
 
 ## Latest Development Changes
 ```bash
-git clone https://github.com/anfederico/Clairvoyant
+python -m pip install git+https://github.com/anfederico/clairvoyant
 ```
 
 ## Backtesting Signal Accuracy
@@ -101,7 +101,7 @@ Sell Accuracy: 59.3%
 ---------------------------------------
 ```
 
-<img src="https://github.com/anfederico/Clairvoyant/blob/master/media/SBUX.png">
+<img src="https://github.com/anfederico/clairvoyant/blob/master/media/SBUX.png">
 
 ## Simulate a Trading Strategy
 Once you've established your model can accurately predict price movement a day in advance, 
@@ -151,19 +151,19 @@ Total Trades : 350
 ---------------------------------------
 ```
 
-<img src="https://raw.githubusercontent.com/anfederico/Clairvoyant/master/media/Chart.png">
+<img src="https://raw.githubusercontent.com/anfederico/clairvoyant/master/media/Chart.png">
 
 ## Other Projects
 #### Intensive Backtesting
 The primary purpose of this project is to rapidly test datasets on machine learning algorithms (specifically Support Vector Machines). While the Simulation class allows for basic strategy testing, there are other projects more suited for that task. Once you've tested patterns within your data and simulated a basic strategy, I'd recommend taking your model to the next level with:
 ```text
-https://github.com/anfederico/Gemini
+https://github.com/anfederico/gemini
 ```
 
 #### Social Sentiment Scores
 The examples shown use data derived from a project where we are data mining social media and performing stock sentiment analysis. To get an idea of how we do that, please take a look at:
 ```text
-https://github.com/anfederico/Stocktalk
+https://github.com/anfederico/stocktalk
 ```
 
 ## Notes
@@ -177,7 +177,7 @@ variables = ["SSO", "SSC", "RSI", ... , "Xn"]  # n features
 ```
 
 ## Contributing
-Please take a look at our [contributing](https://github.com/anfederico/Clairvoyant/blob/master/CONTRIBUTING.md) guidelines if you're interested in helping!
+Please take a look at our [contributing](https://github.com/anfederico/clairvoyant/blob/master/CONTRIBUTING.md) guidelines if you're interested in helping!
 #### Pending Features
 - Export model
 - Support for multiple sklearn SVM models
